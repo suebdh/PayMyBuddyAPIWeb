@@ -83,21 +83,24 @@ L’application est organisée en plusieurs couches :
 ## Configuration
 
 1. **Créer la base de données MySQL**
-- Méthode 1 : Lancer le script SQL (par exemple via MySQL Workbench ou en ligne de commande) pour créer la base et les
-  tables :
-   ```bash
-   mysql -u root -p < src/main/resources/script/schema.sql
-- Méthode 2 : Directement depuis MySQL
-   ```sql
-   CREATE DATABASE paymybuddy;
-   USE paymybuddy;
-   -- puis exécuter le contenu de schema.sql
+
+    - **Méthode 1** : Lancer le script SQL (par exemple via MySQL Workbench ou en ligne de commande) pour créer la base et les tables :
+      ```bash
+      mysql -u root -p < src/main/resources/script/schema.sql
+      ```
+
+    - **Méthode 2** : Directement depuis MySQL
+      ```sql
+      CREATE DATABASE paymybuddy;
+      USE paymybuddy;
+      source src/main/resources/script/schema.sql
+      ```
 
 2. **Configurer les identifiants dans src/main/resources/application.properties** (à faire plus tard)
    ```properties
    spring.datasource.url=jdbc:mysql://localhost:3306/paymybuddy?serverTimezone=UTC
    spring.datasource.username=root
-   spring.datasource.password=ton_mot_de_passe
+   spring.datasource.password=password
    spring.jpa.properties.hibernate.dialect = org.hibernate.dialect.MySQLDialect
    spring.jpa.hibernate.ddl-auto=update
    spring.jpa.show-sql=true
@@ -107,7 +110,9 @@ L’application est organisée en plusieurs couches :
     mvn spring-boot:run
 
 4. **Accéder à l’application**
-   http://localhost:8080
+   
+   - URL : http://localhost:8080 (port de l'application web Spring Boot)
+   - Port MySQL : 3306 (pour la base de données)
 
 ## Base de données
 
