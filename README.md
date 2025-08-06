@@ -96,14 +96,17 @@ L’application est organisée en plusieurs couches :
       source src/main/resources/script/schema.sql
       ```
 
-2. **Configurer les identifiants dans src/main/resources/application.properties** (à faire plus tard)
-   ```properties
-   spring.datasource.url=jdbc:mysql://localhost:3306/paymybuddy?serverTimezone=UTC
-   spring.datasource.username=root
-   spring.datasource.password=password
-   spring.jpa.properties.hibernate.dialect = org.hibernate.dialect.MySQLDialect
-   spring.jpa.hibernate.ddl-auto=update
-   spring.jpa.show-sql=true
+2. **Configurer les identifiants dans src/main/resources/application.properties**
+Important : Créer deux variables d'environnement système DB_USERNAME et DB_PASSWORD avant de lancer l'application
+   - DB_USERNAME : le nom d’utilisateur MySQL
+   - DB_PASSWORD : le mot de passe MySQL
+      ```properties
+      spring.datasource.url=jdbc:mysql://localhost:3306/paymybuddy?serverTimezone=UTC
+      spring.datasource.username=${DB_USERNAME}
+      spring.datasource.password=${DB_PASSWORD}
+      spring.jpa.properties.hibernate.dialect = org.hibernate.dialect.MySQLDialect
+      spring.jpa.hibernate.ddl-auto=update
+      spring.jpa.show-sql=true
 
 3. **Lancer l’application**
     ```bash

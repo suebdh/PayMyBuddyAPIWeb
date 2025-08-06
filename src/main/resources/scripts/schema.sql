@@ -25,12 +25,14 @@ CREATE TABLE IF NOT EXISTS `app_user` (
   `username` VARCHAR(50) NOT NULL,
   `email` VARCHAR(100) NOT NULL,
   `password` VARCHAR(100) NOT NULL,
-  `balance` DECIMAL(10,2) NULL DEFAULT 0.00,
-  `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE INDEX `username_UNIQUE` (`username` ASC) VISIBLE,
-  UNIQUE INDEX `email_UNIQUE` (`email` ASC) VISIBLE)
+  `balance` DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`))
 ENGINE = InnoDB;
+
+CREATE UNIQUE INDEX `username_UNIQUE` ON `app_user` (`username` ASC) VISIBLE;
+
+CREATE UNIQUE INDEX `email_UNIQUE` ON `app_user` (`email` ASC) VISIBLE;
 
 
 -- -----------------------------------------------------
@@ -45,10 +47,8 @@ CREATE TABLE IF NOT EXISTS `app_transaction` (
   `description` VARCHAR(255) NULL,
   `amount` DECIMAL(10,2) NOT NULL,
   `fees` DECIMAL(10,3) NOT NULL DEFAULT 0.005,
-  `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  INDEX `fk_transaction_sender_idx` (`user_id_sender` ASC) VISIBLE,
-  INDEX `fk_transaction_receiver_idx` (`user_id_receiver` ASC) VISIBLE,
   CONSTRAINT `fk_transaction_sender`
     FOREIGN KEY (`user_id_sender`)
     REFERENCES `app_user` (`id`)
@@ -61,6 +61,10 @@ CREATE TABLE IF NOT EXISTS `app_transaction` (
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
+CREATE INDEX `fk_transaction_sender_idx` ON `app_transaction` (`user_id_sender` ASC) VISIBLE;
+
+CREATE INDEX `fk_transaction_receiver_idx` ON `app_transaction` (`user_id_receiver` ASC) VISIBLE;
+
 
 -- -----------------------------------------------------
 -- Table `user_friendship`
@@ -70,10 +74,8 @@ DROP TABLE IF EXISTS `user_friendship` ;
 CREATE TABLE IF NOT EXISTS `user_friendship` (
   `user_id` INT NOT NULL,
   `friend_id` INT NOT NULL,
-  `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`user_id`, `friend_id`),
-  INDEX `fk_user_friendship_friend_idx` (`friend_id` ASC) VISIBLE,
-  INDEX `fk_user_friendship_user_idx` (`user_id` ASC) INVISIBLE,
   CONSTRAINT `fk_user_friendship_user`
     FOREIGN KEY (`user_id`)
     REFERENCES `app_user` (`id`)
@@ -85,6 +87,10 @@ CREATE TABLE IF NOT EXISTS `user_friendship` (
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
+
+CREATE INDEX `fk_user_friendship_friend_idx` ON `user_friendship` (`friend_id` ASC) VISIBLE;
+
+CREATE INDEX `fk_user_friendship_user_idx` ON `user_friendship` (`user_id` ASC) INVISIBLE;
 
 
 SET SQL_MODE=@OLD_SQL_MODE;
