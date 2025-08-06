@@ -19,12 +19,6 @@ public class AppTransaction {
     @Column(name = "id")
     private int transactionId;
 
-    @Column(name = "user_id_sender", nullable = false)
-    private int sender;
-
-    @Column(name = "user_id_receiver", nullable = false)
-    private int receiver;
-
     private String description;
 
     @Column(name = "amount", nullable = false)
@@ -38,4 +32,12 @@ public class AppTransaction {
             columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime transactionCreatedAt;
 
+    @ManyToOne (fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id_sender", nullable = false, foreignKey = @ForeignKey(name = "fk_transaction_sender"))
+    private AppUser sender;
+
+    @ManyToOne (fetch =FetchType.EAGER)
+    @JoinColumn(name = "user_id_receiver", nullable = false,foreignKey = @ForeignKey(name = "fk_transaction_receiver")
+     )
+    private AppUser receiver;
 }
