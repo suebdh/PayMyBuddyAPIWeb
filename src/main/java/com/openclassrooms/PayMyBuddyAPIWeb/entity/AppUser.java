@@ -1,16 +1,13 @@
 package com.openclassrooms.PayMyBuddyAPIWeb.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
-@Getter
-@Setter
 @Entity
 @Table(name = "app_user")
 public class AppUser {
@@ -34,6 +31,7 @@ public class AppUser {
 
     @Column(name = "created_at", nullable = false, updatable = false,
             columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @CreationTimestamp
     private LocalDateTime userCreatedAt;
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -53,4 +51,71 @@ public class AppUser {
         friend.getFriends().remove(this);
     }
 
+    public int getUserId() {
+        return userId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public BigDecimal getBalance() {
+        return balance;
+    }
+
+    public LocalDateTime getUserCreatedAt() {
+        return userCreatedAt;
+    }
+
+    public Set<AppUser> getFriends() {
+        return friends;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void setBalance(BigDecimal balance) {
+        this.balance = balance;
+    }
+
+    public void setUserCreatedAt(LocalDateTime userCreatedAt) {
+        this.userCreatedAt = userCreatedAt;
+    }
+
+    public void setFriends(Set<AppUser> friends) {
+        this.friends = friends;
+    }
+
+    public AppUser(int userId, String userName, String email, String password, BigDecimal balance, LocalDateTime userCreatedAt, Set<AppUser> friends) {
+        this.userId = userId;
+        this.userName = userName;
+        this.email = email;
+        this.password = password;
+        this.balance = balance;
+        this.userCreatedAt = userCreatedAt;
+        this.friends = friends;
+    }
+
+    public AppUser() {}
 }
