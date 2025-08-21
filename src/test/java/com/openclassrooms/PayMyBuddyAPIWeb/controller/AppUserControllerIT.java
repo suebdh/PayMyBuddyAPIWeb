@@ -37,7 +37,7 @@ public class AppUserControllerIT {
                 0,
                 "sue",
                 "sh@yahoo.fr",
-                "3GHE5",
+                "3GHE53GHE53GHE6",
                 new BigDecimal("2000"),
                 null);
 
