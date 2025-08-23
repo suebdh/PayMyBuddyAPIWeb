@@ -7,12 +7,17 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -27,10 +32,8 @@ public class AppUserControllerIT {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Autowired
-    private AppUserRepository appUserRepository;
-
     @Test
+    @WithMockUser
     public void testCreateUser_shouldReturnAppUser() throws Exception {
         // given
         AppUserDTO appUserDTO = new AppUserDTO(
@@ -43,11 +46,12 @@ public class AppUserControllerIT {
 
         // when / then
         mockMvc.perform(post("/api/users")
-                        .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(appUserDTO)))
-                .andExpect(status().isOk());
-             //   .andExpect(jsonPath("$.userName", is("sue")))
-               // .andExpect(jsonPath("$.balance", is(2000)));
+                .andExpect(status().isOk())
+             .andExpect(jsonPath("$.userName", is("sue")))
+               .andExpect(jsonPath("$.balance", is(2000)));
 
     }
 }
