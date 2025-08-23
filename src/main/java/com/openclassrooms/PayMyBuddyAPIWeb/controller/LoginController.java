@@ -25,21 +25,4 @@ public class LoginController {
         return "login";
     }
 
-    @PostMapping("/login")
-    public String processLogin(@Valid @ModelAttribute("loginDTO") LoginDTO loginDTO, BindingResult bindingResult, Model model) {
-
-        if (bindingResult.hasErrors()) {
-            return "login"; // affiche les erreurs de validation dans le template
-        }
-
-        boolean isAuthenticated = loginService.authenticate(loginDTO.getEmail(), loginDTO.getPassword());
-
-        if (isAuthenticated) {
-            return "redirect:/home";
-        } else {
-            model.addAttribute("error", "Login et/ou mot de passe erroné(s)");
-            model.addAttribute("loginDTO", loginDTO); // pour afficher à nouveau l'email saisi
-            return "login";
-        }
-    }
 }
