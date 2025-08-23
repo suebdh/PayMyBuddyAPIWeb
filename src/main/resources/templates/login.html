@@ -12,41 +12,58 @@
         }
 
         .login-card {
-          max-width: 400px;
+          width: 500px;      /* largeur fixe */
+          height: 688px;     /* hauteur fixe */
           margin: 5rem auto;
-          padding: 2rem;
+          padding: 40px 32px;
           border-radius: 1rem;
           box-shadow: 0 0 15px rgba(0,0,0,0.1);
           background: #fff;
-        }
+          display: flex; /* on crée un conteneur flexbox*/
+          flex-direction: column; /* les éléments dans le conteneur en colonne pour avoir le H2 et les input les uns en dessous des autres */
+          align-items: center; /* on les centre comme sur la maquette */
 
+        }
+  /* Titre PayMyBuddy */
         .login-card h2 {
+          width: 214px;
+          height: 64px;
+          line-height: 64px;           /* permet de centrer verticalement le texte */
           text-align: center;
-          margin-bottom: 1.5rem;
-          color: #5bc0de;
+          color: #FFFFFF;
+          background: #F69F1D;
+          border-radius: 8px;
+          padding: 14px 24px;
+          margin-bottom: 2rem;
         }
 
-        label {
-          display: block;
-          margin-bottom: 0.5rem;
-          font-weight: bold;
-        }
+/* Centrage du formulaire */
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* centre tous les enfants : inputs + bouton */
+  gap: 1rem; /* espace régulier entre les champs */
+}
 
+ /* Champs input */
         input[type="email"],
         input[type="password"] {
-          width: 100%;
-          padding: 0.5rem;
-          margin-bottom: 1rem;
-          border-radius: 0.5rem;
-          border: 1px solid #ccc;
-          box-sizing: border-box;
+           width: 295px;
+           height: 60px;
+           padding: 12px 16px;
+           margin-bottom: 1rem;
+           border-radius: 8px;
+           border: 1px solid #ccc;
+           box-sizing: border-box;
         }
 
+ /* Bouton Se connecter */
         button {
-          width: 100%;
-          padding: 0.75rem;
+          width: 205px;
+          height: 64px;
+          padding: 14px 24px;
           border: none;
-          border-radius: 0.5rem;
+          border-radius: 8px;
           background-color: #5bc0de;
           color: white;
           font-size: 1rem;
@@ -80,25 +97,21 @@
 </head>
 <body>
 <div class="login-card">
-    <h2>Page de Connexion</h2>
+    <h2>Pay My Buddy</h2>
 
     <!-- Message d'erreur -->
-   <div th:if="${error}" class="error-message" th:text="${error}"></div>
+    <div th:if="${error}" class="error-message" th:text="${error}"></div>
 
     <form method="post" th:action="@{/login}" th:object="${loginDTO}">
-        <!-- Champ email -->
-        <label> Mail
-            <input type="email" th:field="*{email}" placeholder="exemple@email.com" required>
+        <!-- Champ email MAIS AVEC NAME=username -->
+        <label>
+            <input type="email" name="username" placeholder="Mail" required>
         </label>
-        <!-- Erreur email -->
-        <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="error-message"></div>
 
         <!-- Champ mot de passe -->
-        <label>Mot de passe
-            <input type="password" th:field="*{password}" placeholder="********" required>
+        <label>
+            <input type="password" name="password" placeholder="Mot de passe" required>
         </label>
-        <!-- Erreur mot de passe -->
-        <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="error-message"></div>
 
         <button type="submit">Se connecter</button>
     </form>
