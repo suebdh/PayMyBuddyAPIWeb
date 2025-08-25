@@ -1,6 +1,7 @@
 package com.openclassrooms.PayMyBuddyAPIWeb.controller;
 
 import com.openclassrooms.PayMyBuddyAPIWeb.dto.AppUserDTO;
+import com.openclassrooms.PayMyBuddyAPIWeb.dto.RegisterDTO;
 import com.openclassrooms.PayMyBuddyAPIWeb.service.AppUserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +44,9 @@ public class AppUserController {
     }
 
     @PostMapping
-    public ResponseEntity<AppUserDTO> createUser(@Valid @RequestBody AppUserDTO appUserDTO){
-        return ResponseEntity.ok(appUserService.createUser(appUserDTO));
+    public ResponseEntity<Void> createUser(@Valid @RequestBody RegisterDTO registerDTO){
+        return ResponseEntity.ok().build();
     }
+
+
 }
