@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>PayMyBuddy - Inscription</title>
+    <style>
+        body {
+          font-family: Open Sans, sans-serif;
+          background-color: #f8f9fa;
+          margin: 0;
+          padding: 0;
+        }
+
+        .register-card {
+          max-width: 400px;
+          margin: 5rem auto;
+          padding: 2rem 3rem;
+          border-radius: 1rem;
+          box-shadow: 0 0 15px rgba(0,0,0,0.1);
+          background: #fff;
+          display: flex; /* ici on crée un conteneur flexbox*/
+          flex-direction: column; /* les éléments dans le conteneur en colonne pour avoir le H2 et les input les uns en dessous des autres */
+          align-items: center; /* et là on les centre comme sur la maquette */
+        }
+
+        .register-card h2 {
+          width: 214px;
+          margin: 3rem auto 1.5rem auto; /* centré + marge bas */
+          text-align: center;
+          color: #FFFFFF;
+          background: #F69F1D;
+          border-radius: 8px; /* ajout des arrondis */
+          padding: 14px 24px;
+          display: flex;
+          align-items: center;   /* centrage vertical */
+          justify-content: center; /* centrage horizontal */
+        }
+
+        input::placeholder {
+          font-weight: bold;
+          color: #828282;
+        }
+
+        label {
+          display: block;
+          margin-bottom: 0.5rem;
+          font-weight: bold;
+        }
+
+        input[type="email"],input[type="text"],
+        input[type="password"] {
+          width: 295px;
+          height: 60px;
+          padding: 12px 16px;
+          border-radius: 8px;
+          border: 1px solid #ccc;
+          box-sizing: border-box;
+          margin: 0; /* marge gérée par label */
+        }
+
+        button {
+          width: 159px;
+          height: 64px;
+          padding: 14px 24px;
+          border: none;
+          border-radius: 8px;
+          background-color: #207FEE;
+          color: white;
+          font-size: 1rem;
+          cursor: pointer;
+        }
+
+        button:hover {
+          background-color: #004085;
+        }
+
+        p {
+          text-align: center;
+          margin-top: 1rem;
+        }
+
+    /* Centrage du formulaire */
+        form {
+          display: flex;
+          flex-direction: column;
+          align-items: center; /* centre tous les enfants : inputs + bouton */
+          }
+
+    /* Premier label (contenant le premier input) */
+        form label:first-of-type {
+          margin-top: 2rem; /* espace depuis le titre */
+          margin-bottom: 0.5rem; /* petit espace vers le suivant */
+          }
+
+        /* Labels intermédiaires */
+        form label:nth-of-type(2) {
+          margin-bottom: 0.5rem;
+          }
+
+        /* Dernier label */
+        form label:last-of-type {
+          margin-bottom: 5rem; /* espace avant le bouton */
+          }
+
+        .error-message {
+          color: red;
+          text-align: center;
+          margin-bottom: 1rem;
+        }
+
+    </style>
+
+</head>
+<body>
+<div class="register-card">
+    <h2>Pay My Buddy</h2>
+
+    <!-- Message d'erreur -->
+    <div th:if="${error}" class="error-message" th:text="${error}"></div>
+
+    <form method="post" th:action="@{/register}" th:object="${registerDTO}">
+        <!-- Champ username -->
+        <label>
+            <input type="text" th:field="*{userName}" placeholder="Username" required>
+        </label>
+        <!-- Erreur username -->
+        <div th:if="${#fields.hasErrors('userName')}" th:errors="*{userName}" class="error-message"></div>
+
+        <!-- Champ email -->
+        <label>
+            <input type="email" th:field="*{email}" placeholder="Mail" required>
+        </label>
+        <!-- Erreur email -->
+        <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="error-message"></div>
+
+        <!-- Champ mot de passe -->
+        <label>
+            <input type="password" th:field="*{password}" placeholder="Mot de passe" required>
+        </label>
+        <!-- Erreur mot de passe -->
+        <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="error-message"></div>
+
+        <button type="submit">S’inscrire</button>
+    </form>
+
+</div>
+</body>
+</html>
