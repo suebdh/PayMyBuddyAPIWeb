@@ -13,7 +13,7 @@
 
         .login-card {
           width: 500px;      /* largeur fixe */
-          height: 688px;     /* hauteur fixe */
+          min-height: 688px;     /* hauteur minimale */
           margin: 5rem auto;
           padding: 40px 32px;
           border-radius: 1rem;
@@ -27,23 +27,17 @@
   /* Titre PayMyBuddy */
         .login-card h2 {
           width: 214px;
-          height: 64px;
-          line-height: 64px;           /* permet de centrer verticalement le texte */
+          margin: 3rem auto 1.5rem auto; /* centré + marge bas */
           text-align: center;
           color: #FFFFFF;
           background: #F69F1D;
-          border-radius: 8px;
+          border-radius: 8px; /* ajout des arrondis */
           padding: 14px 24px;
-          margin-bottom: 2rem;
-        }
+          display: flex;
+          align-items: center; /* centrage vertical */
+          justify-content: center; /* centrage horizontal */
 
-/* Centrage du formulaire */
-form {
-  display: flex;
-  flex-direction: column;
-  align-items: center; /* centre tous les enfants : inputs + bouton */
-  gap: 1rem; /* espace régulier entre les champs */
-}
+        }
 
  /* Champs input */
         input[type="email"],
@@ -64,7 +58,7 @@ form {
           padding: 14px 24px;
           border: none;
           border-radius: 8px;
-          background-color: #5bc0de;
+          background-color: #207FEE;
           color: white;
           font-size: 1rem;
           cursor: pointer;
@@ -88,12 +82,36 @@ form {
           text-decoration: underline;
         }
 
+/* Centrage du formulaire */
+        form {
+          display: flex;
+          flex-direction: column;
+          align-items: center; /* centre tous les enfants : inputs + bouton */
+        }
+
+        /* Premier label (contenant le premier input) */
+        form label:first-of-type {
+          margin-top: 5rem; /* espace depuis le titre */
+          margin-bottom: 0.5rem; /* petit espace vers le suivant */
+        }
+
+        /* Labels intermédiaires */
+          form label:nth-of-type(2) {
+          margin-bottom: 0.5rem;
+        }
+
+        /* Dernier label */
+           form label:last-of-type {
+           margin-bottom: 5rem; /* espace avant le bouton */
+        }
+
         .error-message {
-      color: red;
-      text-align: center;
-      margin-bottom: 1rem;
-    }
+            color: red;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
     </style>
+
 </head>
 <body>
 <div class="login-card">
@@ -102,7 +120,7 @@ form {
     <!-- Message d'erreur -->
     <div th:if="${error}" class="error-message" th:text="${error}"></div>
 
-    <form method="post" th:action="@{/login}" th:object="${loginDTO}">
+    <form method="post" th:action="@{/login}">
         <!-- Champ email MAIS AVEC NAME=username -->
         <label>
             <input type="email" name="username" placeholder="Mail" required>

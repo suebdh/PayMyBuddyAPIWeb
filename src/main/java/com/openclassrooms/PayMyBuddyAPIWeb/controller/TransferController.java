@@ -4,10 +4,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
-public class HomeController {
+public class TransferController {
 
-    @GetMapping("/home")
-    public String showHomePage() {
-        return "home"; // correspond à home.html dans /templates
+    @GetMapping("/transfer")
+    public String showTransferPage() {
+        return "transfer"; // correspond à transfer.html dans /templates
     }
 }

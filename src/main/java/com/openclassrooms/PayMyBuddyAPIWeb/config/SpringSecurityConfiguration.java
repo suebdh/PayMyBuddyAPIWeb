@@ -23,11 +23,19 @@ public class SpringSecurityConfiguration {
                         .anyRequest().authenticated() // le reste nécessite login
                 )
                 .formLogin(form -> form
-                        .loginPage("/login") // login.html
-                        .defaultSuccessUrl("/home", true) // page après login
+                        .loginPage("/login") // page custom : login.html
+                        .defaultSuccessUrl("/transfer", true) // redirection après succès
+                        // Gestion personnalisée de l’échec de connexion :
+                        // si les identifiants sont incorrects, on stocke un message d'erreur dans la session et on redirige vers /login
+                        .failureHandler((request, response, exception) -> {
+                            request.getSession().setAttribute("error", "Email et/ou mot de passe incorrect(s).");
+                            response.sendRedirect("/login");
+                        })
                         .permitAll()
                 )
                 .logout(logout -> logout.permitAll());
+
+
 
         return http.build();
     }
