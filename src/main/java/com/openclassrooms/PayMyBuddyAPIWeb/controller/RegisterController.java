@@ -21,7 +21,7 @@ public class RegisterController {
     @Autowired
     private AppUserService appUserService;
 
-    // GET /register : afficher le formulaire
+    // Méthode GET /register : afficher le formulaire
     @GetMapping("/register")
     public String showRegisterForm(Model model) {
         log.info("********** Obtenir la page de : INSCRIPTION **********");
@@ -30,7 +30,7 @@ public class RegisterController {
     }
 
 
-    // POST /register : traitement du formulaire
+    // Méthode POST /register : traitement du formulaire
     @PostMapping("/register")
     public String registerUser(@Valid RegisterDTO registerDTO,
                                BindingResult bindingResult,
