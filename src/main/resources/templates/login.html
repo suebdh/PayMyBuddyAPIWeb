@@ -117,6 +117,13 @@
 <div class="login-card">
     <h2>Pay My Buddy</h2>
 
+    <!-- Message de succès après inscription -->
+    <div th:if="${param.registered}">
+        <p style="color: green; text-align: center;">
+            Inscription réussie ! Vous pouvez vous connecter.
+        </p>
+    </div>
+
     <!-- Message d'erreur -->
     <div th:if="${error}" class="error-message" th:text="${error}"></div>
 
