@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>PayMyBuddy - Profil</title>
+    <link rel="stylesheet" th:href="@{/css/styleHeader.css}">
+</head>
+<body>
+
+<!-- inclusion du header : on passe 'profil' en param -->
+<div th:replace="~{fragments/header :: header('profil')}"></div>
+
+<main>
+    <h1>Bienvenue - Profil</h1>
+    <p>Contenu page profil… </p>
+</main>
+
+</body>
+</html>

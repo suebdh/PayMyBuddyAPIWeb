@@ -1,0 +1,30 @@
+<header xmlns:th="http://www.thymeleaf.org"
+        th:fragment="header(activePage)">
+
+  <div class="header-inner">
+    <!-- Titre à gauche -->
+    <div class="brand">
+      <a th:href="@{/}">Pay My Buddy</a>
+    </div>
+
+    <!-- Nav à droite -->
+    <nav class="main-nav">
+      <a th:href="@{/transfer}"
+         th:classappend="${activePage == 'transfer'} ? ' active' : ''">Transférer</a>
+
+      <a th:href="@{/profil}"
+         th:classappend="${activePage == 'profil'} ? ' active' : ''">Profil</a>
+
+      <a th:href="@{/relation}"
+         th:classappend="${activePage == 'relation'} ? ' active' : ''">Ajouter relation</a>
+
+      <!-- Logout -->
+      <form id="form-logout" th:action="@{/logout}" method="post" style="display:none;">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+      </form>
+     <a href="#" onclick="document.getElementById('form-logout').submit(); return false;">
+        Se déconnecter
+      </a>
+    </nav>
+  </div>
+</header>
