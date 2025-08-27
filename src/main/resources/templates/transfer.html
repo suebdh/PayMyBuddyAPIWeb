@@ -3,9 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <title>PayMyBuddy - Transfert</title>
+    <link rel="stylesheet" th:href="@{/css/styleHeader.css}">
 </head>
 <body>
-    <h1>Bienvenue sur PayMyBuddy-Page de Transfert</h1>
-    <p>Vous êtes connecté(e) avec succès.</p>
+
+<!-- inclusion du header : on passe 'transfer' en param -->
+<div th:replace="fragments/header :: header('transfer')"></div>
+
+<main>
+    <h1>Bienvenue - Transfert</h1>
+    <p>Contenu page transfert…</p>
+</main>
+
 </body>
 </html>
