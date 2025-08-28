@@ -42,8 +42,10 @@ public class AppUser {
     private Set<AppUser> friends = new HashSet<>(); //collection unique sans importance d'ordre
 
     public void addFriend(AppUser friend) {
+        // Ajouter l'ami à la liste des amis de l'utilisateur courant
         friends.add(friend);
-        friend.getFriends().add(this);
+        //friend.getFriends().add(this); // Pas besoin de cette ligne pour l'instant,
+        // car on souhaite garder la relation unidirectionnelle (uniquement pour gérer l'ajout de bénéficiaires dans le contexte des transferts d'argent)
     }
 
     public void removeFriend(AppUser friend) {
