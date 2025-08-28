@@ -8,6 +8,8 @@ import com.openclassrooms.PayMyBuddyAPIWeb.exception.UserNotFoundException;
 import com.openclassrooms.PayMyBuddyAPIWeb.exception.UsernameAlreadyUsedException;
 import com.openclassrooms.PayMyBuddyAPIWeb.repository.AppUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -40,7 +42,7 @@ public class AppUserService {
     }
 
     public List<AppUserDTO> getAllUsers() {
-        return ((List<AppUser>) appUserRepository.findAll())
+        return appUserRepository.findAll()
                 .stream()  // Transforme la liste en Stream
                 .map(this::convertToDTO) // Convertit chaque AppUser en AppUserDTO
                 .collect(Collectors.toList()); // Re-transforme en List
@@ -97,6 +99,39 @@ public class AppUserService {
 
         // 4- Sauvegarder et retourner le DTO
         return convertToDTO(appUserRepository.save(existingUser));
+    }
+
+    public void addFriendByEmail(String friendEmail) {
+        // Étape 1 : Récupérer l'utilisateur courant connecté
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String currentUserEmail = auth.getName();
+        // getName() retourne l'email (config .withUsername(user.getEmail() de CustomUserDetailsService)
+
+        AppUser currentUser = appUserRepository.findByEmail(currentUserEmail)
+                .orElseThrow(() -> new UserNotFoundException("Utilisateur courant introuvable !"));
+
+        // Étape 2 : Vérifier si l'ami existe en BDD
+        AppUser friend = appUserRepository.findByEmail(friendEmail)
+                .orElseThrow(() -> new UserNotFoundException("Aucun utilisateur-ami trouvé avec cet email !"));
+
+        // Étape 3 : Garde-fou : Empêcher de s’ajouter soi-même
+        if (currentUser.getEmail().equals(friend.getEmail())) {
+            throw new IllegalArgumentException("Vous ne pouvez pas vous ajouter vous-même en ami !");
+        }
+
+        // Étape 4 : Vérifier si la relation existe déjà
+        if (currentUser.getFriends().contains(friend)) {
+            throw new IllegalStateException("Cet utilisateur est déjà dans la liste de vos amis !");
+        }
+
+        // Étape 5 : Ajouter la relation
+        currentUser.addFriend(friend);
+
+       // Étape 6 : Sauvegarder l'utilisateur courant pour persister la relation dans la table de jointure
+        // Comme la relation est unidirectionnelle, il suffit de sauvegarder currentUser.
+        // La table de jointure sera mise à jour automatiquement.
+        // Si la relation était bidirectionnelle, il faudrait aussi sauvegarder friend ou utiliser cascade pour propager.
+        appUserRepository.save(currentUser);
     }
 
     public AppUserDTO convertToDTO(AppUser appUser) {
