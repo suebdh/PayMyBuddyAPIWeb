@@ -12,15 +12,19 @@ public class SpringSecurityConfiguration {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        // Configuration des règles de sécurité HTTP :
-        // - Les URLs /register et /login sont publiques
-        // - Toutes les autres URLs nécessitent une authentification
-        // - Configuration du formulaire de login avec page custom et redirection après succès
-        // - Activation du logout (déconnexion)
+        // Configuration des règles de sécurité HTTP –
+        //  Les URLs /register et /login sont publiques
+        // Toutes les autres URLs nécessitent une authentification
+        // Configuration du formulaire de login avec page custom et redirection après succès
+        // Activation du logout (déconnexion)
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/register", "/login").permitAll() // pages publiques
-                        .anyRequest().authenticated() // le reste nécessite login
+                        // pages publiques
+                        .requestMatchers("/register", "/login").permitAll()
+                        // autorise les fichiers CSS, JS, images
+                        .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
+                        // toutes les autres requêtes nécessitent authentification
+                        .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
                         .loginPage("/login") // page custom : login.html
@@ -33,7 +37,10 @@ public class SpringSecurityConfiguration {
                         })
                         .permitAll()
                 )
-                .logout(logout -> logout.permitAll());
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/login?logout")
+                        .permitAll());
 
 
 

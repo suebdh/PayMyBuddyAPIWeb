@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Slf4j
 @Controller
@@ -19,7 +20,7 @@ public class LoginController {
     }
 
     @GetMapping("/login")
-    public String showLoginForm(Model model, HttpSession session) {
+    public String showLoginForm(Model model, HttpSession session, @RequestParam(value = "logout", required = false) String logout) {
 
         log.info("********** Obtenir la page de : CONNEXION **********");
 
@@ -32,6 +33,12 @@ public class LoginController {
             // Supprime l'erreur de la session après affichage pour éviter qu'elle reste visible si l'utilisateur recharge la page
             session.removeAttribute("error"); // nettoyer après affichage
         }
+
+        // Vérifie si l’utilisateur vient de se déconnecter
+        if (logout != null) {
+            model.addAttribute("success", "Déconnexion réussie !");
+        }
+
         return "login";
     }
 
