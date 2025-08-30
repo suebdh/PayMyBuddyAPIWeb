@@ -3,115 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>PayMyBuddy - Connexion</title>
-    <style>
-        body {
-          font-family: Open Sans, sans-serif;
-          background-color: #f8f9fa;
-          margin: 0;
-          padding: 0;
-        }
-
-        .login-card {
-          width: 500px;      /* largeur fixe */
-          min-height: 688px;     /* hauteur minimale */
-          margin: 5rem auto;
-          padding: 40px 32px;
-          border-radius: 1rem;
-          box-shadow: 0 0 15px rgba(0,0,0,0.1);
-          background: #fff;
-          display: flex; /* on crée un conteneur flexbox*/
-          flex-direction: column; /* les éléments dans le conteneur en colonne pour avoir le H2 et les input les uns en dessous des autres */
-          align-items: center; /* on les centre comme sur la maquette */
-
-        }
-  /* Titre PayMyBuddy */
-        .login-card h2 {
-          width: 214px;
-          margin: 3rem auto 1.5rem auto; /* centré + marge bas */
-          text-align: center;
-          color: #FFFFFF;
-          background: #F69F1D;
-          border-radius: 8px; /* ajout des arrondis */
-          padding: 14px 24px;
-          display: flex;
-          align-items: center; /* centrage vertical */
-          justify-content: center; /* centrage horizontal */
-
-        }
-
- /* Champs input */
-        input[type="email"],
-        input[type="password"] {
-           width: 295px;
-           height: 60px;
-           padding: 12px 16px;
-           margin-bottom: 1rem;
-           border-radius: 8px;
-           border: 1px solid #ccc;
-           box-sizing: border-box;
-        }
-
- /* Bouton Se connecter */
-        button {
-          width: 205px;
-          height: 64px;
-          padding: 14px 24px;
-          border: none;
-          border-radius: 8px;
-          background-color: #207FEE;
-          color: white;
-          font-size: 1rem;
-          cursor: pointer;
-        }
-
-        button:hover {
-          background-color: #004085;;
-        }
-
-        p {
-          text-align: center;
-          margin-top: 1rem;
-        }
-
-        a {
-          color: #5bc0de;
-          text-decoration: none;
-        }
-
-        a:hover {
-          text-decoration: underline;
-        }
-
-/* Centrage du formulaire */
-        form {
-          display: flex;
-          flex-direction: column;
-          align-items: center; /* centre tous les enfants : inputs + bouton */
-        }
-
-        /* Premier label (contenant le premier input) */
-        form label:first-of-type {
-          margin-top: 5rem; /* espace depuis le titre */
-          margin-bottom: 0.5rem; /* petit espace vers le suivant */
-        }
-
-        /* Labels intermédiaires */
-          form label:nth-of-type(2) {
-          margin-bottom: 0.5rem;
-        }
-
-        /* Dernier label */
-           form label:last-of-type {
-           margin-bottom: 5rem; /* espace avant le bouton */
-        }
-
-        .error-message {
-            color: red;
-            text-align: center;
-            margin-bottom: 1rem;
-        }
-    </style>
-
+    <link rel="stylesheet" th:href="@{/css/login.css}">
 </head>
 <body>
 <div class="login-card">
@@ -119,9 +11,14 @@
 
     <!-- Message de succès après inscription -->
     <div th:if="${param.registered}">
-        <p style="color: green; text-align: center;">
+        <p class="success-message">
             Inscription réussie ! Vous pouvez vous connecter.
         </p>
+    </div>
+
+    <!-- Message de succès après déconnexion -->
+    <div th:if="${success}">
+        <p class="success-message" th:text="${success}"></p>
     </div>
 
     <!-- Message d'erreur -->
@@ -129,14 +26,12 @@
 
     <form method="post" th:action="@{/login}">
         <!-- Champ email MAIS AVEC NAME=username -->
-        <label>
-            <input type="email" name="username" placeholder="Mail" required>
-        </label>
+        <label for ="username" class="visually-hidden">Adresse email</label>
+            <input type="email" id ="username" name="username" placeholder="Mail" required>
 
         <!-- Champ mot de passe -->
-        <label>
-            <input type="password" name="password" placeholder="Mot de passe" required>
-        </label>
+        <label for="password" class="visually-hidden">Mot de passe</label>
+            <input type="password" id="password" name="password" placeholder="Mot de passe" required>
 
         <button type="submit">Se connecter</button>
     </form>

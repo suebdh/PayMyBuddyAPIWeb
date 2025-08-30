@@ -35,4 +35,12 @@ public class LoginControllerIT {
                 .andExpect(view().name("login"))
                 .andExpect(model().attribute("error", "Identifiants invalides!"));
     }
+
+    @Test
+    public void showLoginForm_withLogoutParam_shouldAddSuccessMessageToModel() throws Exception {
+        mockMvc.perform(get("/login").param("logout", ""))
+                .andExpect(status().isOk())
+                .andExpect(view().name("login"))
+                .andExpect(model().attribute("success", "Déconnexion réussie !"));
+    }
 }
