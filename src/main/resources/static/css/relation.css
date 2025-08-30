@@ -1,0 +1,99 @@
+ /* 1. Base globale */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 90px 40px 20px;
+        }
+
+        /* 2. Messages de succès et d'erreur */
+        /* Messages */
+        .success-message {
+            color: green;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .error-message {
+            color: red;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* 3. Formulaire principal */
+        form {
+            background: #ffffff;
+            padding: 30px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            max-width: 946px;
+            margin-top: 50px;      /* décalage vertical vers le bas */
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* 4. Groupes et layout interne du formulaire */
+        .form-group {
+            flex: 1;                 /* prend tout l’espace disponible à gauche */
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+       }
+
+        .form-row {
+            display: flex;
+            align-items: center;
+            gap: 30px;               /* augmente l'espace entre input et bouton */
+        }
+
+        .form-actions {
+            display: flex;
+            align-items: flex-end;   /* bouton aligné verticalement avec le bas du champ */
+            justify-content: flex-end; /* horizontalement */
+        }
+
+        /* 5. Labels et champs input */
+        label {
+            font-weight: bold;
+        }
+
+        input[type="email"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        input[type="email"].is-invalid {
+            border-color: red;
+        }
+
+        .invalid-feedback {
+            color: red;
+            font-size: 0.9em;
+        }
+
+        /* 6. Boutons */
+         button {
+            background: #f0ad4e; /* couleur "warning" Bootstrap */
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #ec9a25;
+        }
