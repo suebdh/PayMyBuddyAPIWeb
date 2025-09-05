@@ -11,16 +11,16 @@ USE paymybuddy_test;
 -- Insertion de 10 utilisateurs
 -- -----------------------------------------------------
 INSERT INTO app_user (username, email, password, balance) VALUES
-('Alice', 'alice@example.com', 'password123', 500.00),
-('Bob', 'bob@example.com', 'password123', 300.00),
-('Charlie', 'charlie@example.com', 'password123', 450.00),
-('David', 'david@example.com', 'password123', 600.00),
-('Eva', 'eva@example.com', 'password123', 350.00),
-('Frank', 'frank@example.com', 'password123', 400.00),
-('Grace', 'grace@example.com', 'password123', 700.00),
-('Hugo', 'hugo@example.com', 'password123', 200.00),
-('Ivy', 'ivy@example.com', 'password123', 550.00),
-('Jack', 'jack@example.com', 'password123', 250.00);
+('Alice', 'alice@example.com', '$2a$12$4hXK2Fkte.mPQij3HXVG.OoT78F2YrZjTiV5RpJ2rBVR/ygzZXgTW', 500.00),
+('Bob', 'bob@example.com', '$2a$12$/hq.efDQggWK5YAfVBKRQOW.lXaBTvfouq/oMR8M3GeoLSRbEZ7fC', 300.00),
+('Charlie', 'charlie@example.com', '$2a$12$/FZXzOGQX9JemoHZj8GgAeBI7hApn19AQakgrvH1cKMUV75..29Mi', 450.00),
+('David', 'david@example.com', '$2a$12$TH5tm03yRUO6TDCihLqrDu4coadZUHemkuJCanf/LfQp9FnVYZ/vW', 600.00),
+('Eva', 'eva@example.com', '$2a$12$iYYiNpa/XKYSkJ9CGH1wh.kcMhBpvlw/8hBNYW878wT2rhjGKArQS', 350.00),
+('Frank', 'frank@example.com', '$2a$12$fuNUZzxNRrOWEhuHPZuT3eIyUfGlgjKQvhiUI5EQwWQdsCWW.Huse', 400.00),
+('Grace', 'grace@example.com', '$2a$12$/x2pA1QLlKa/e1P8KtzRWOBCvFNnpl/JVR9oc8Nhup7XB4CZMGJqe', 700.00),
+('Hugo', 'hugo@example.com', '$2a$12$nBVKL4dCm3tYjuUxXQjMM.ubtC83PW/oyGaaBEvdnwcEWKNoSP.RS', 200.00),
+('Ivy', 'ivy@example.com', '$2a$12$WLOsd3u1EkuatRdD5NRrTu5UWG7vnhKTKTDc3.iR4y6.0v2Ego1Hq', 550.00),
+('Jack', 'jack@example.com', '$2a$12$LjXO2tkGY2Alpvfc0mSWGu.lKD.RUr70DNBAvnWo2wj.7/7jaOuAm', 250.00);
 COMMIT;
 
 
