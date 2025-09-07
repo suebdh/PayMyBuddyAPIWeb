@@ -15,11 +15,13 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -58,4 +60,78 @@ public class ProfilControllerIT {
                 .andExpect(model().attribute("profil", hasProperty("username", is("TestUserProfil"))))
                 .andExpect(model().attribute("profil", hasProperty("email", is("test@example.com"))));
     }
+
+    @Test
+    @WithMockUser(username = "test@example.com")
+    public void updateProfil_shouldUpdateUsernameOnly_whenPasswordNotChanged() throws Exception {
+        mockMvc.perform(post("/profil")
+                        .param("username", "NouveauUsername") // on change juste le username
+                        .param("email", "test@example.com")  // email readonly, il reste le même
+                        .param("password", "") // PAS de changement de mot de passe
+                .with(csrf())) // <-- IMPORTANT
+                .andExpect(status().isOk())
+                .andExpect(view().name("profil"))
+                .andExpect(model().attributeExists("successMessage"))
+                .andExpect(model().attribute("successMessage", "Profil mis à jour avec succès !"));
+
+        // Vérifier que le 'username' a bien été mis à jour en base
+        AppUser updatedUser = appUserRepository.findByEmail("test@example.com")
+                .orElseThrow(() -> new UserNotFoundException("Utilisateur introuvable"));
+        assertEquals("NouveauUsername", updatedUser.getUserName());
+        assertEquals("test@example.com", updatedUser.getEmail()); // email doit rester le même
+    }
+
+    @Test
+    @WithMockUser(username = "test@example.com")
+    public void updateProfil_shouldReturnProfil_whenBindingResultHasErrors() throws Exception {
+        mockMvc.perform(post("/profil")
+                        .param("username", "") // username vide pour déclencher une erreur de validation
+                        .param("email", "test@example.com")
+                        .param("password", "") // pas de changement de mdp
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("profil"))
+                .andExpect(model().attributeHasFieldErrors("profil", "username")); // Vérifie qu'il y a une erreur sur le champ username
+    }
+
+    @Test
+    @WithMockUser(username = "test@example.com")
+    public void updateProfil_shouldRedirectToLogin_whenPasswordChanged() throws Exception {
+        mockMvc.perform(post("/profil")
+                        .param("username", "TestUserProfil") // même username
+                        .param("email", "test@example.com")
+                        .param("password", "NouveauMotDePasse123!") // changement de mdp
+                        .with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/login?passwordChanged"));
+
+        // Vérification que le mot de passe a bien été changé en base (haché)
+        AppUser updatedUser = appUserRepository.findByEmail("test@example.com")
+                .orElseThrow(() -> new UserNotFoundException("Utilisateur introuvable"));
+        assertNotEquals("TUP654123!?", updatedUser.getPassword()); // le mdp a changé
+    }
+
+
+    @Test
+    @WithMockUser(username = "test@example.com")
+    public void updateProfil_shouldReturnProfilWithError_whenUsernameAlreadyUsed() throws Exception {
+        // Créons un autre utilisateur pour provoquer le conflit
+        AppUser anotherUser = new AppUser();
+        anotherUser.setUserName("UsernameExistant");
+        anotherUser.setEmail("other@example.com");
+        anotherUser.setPassword("Password123!");
+        anotherUser.setBalance(BigDecimal.ZERO);
+        appUserRepository.save(anotherUser);
+
+        mockMvc.perform(post("/profil")
+                        .param("username", "UsernameExistant") // username déjà pris
+                        .param("email", "test@example.com")
+                        .param("password", "") // pas de changement de mot de passe
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("profil"))
+                .andExpect(model().attributeExists("errorMessage"))
+                .andExpect(model().attribute("errorMessage", "Nom d'utilisateur déjà utilisé !"));
+    }
+
 }
