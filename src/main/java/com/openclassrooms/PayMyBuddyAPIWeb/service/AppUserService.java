@@ -91,6 +91,11 @@ public class AppUserService {
             validateEmailUnique(appUserDTO.getEmail());
         }
 
+        // 2-BIS Vérifier le 'username' uniquement si l'utilisateur veut le changer
+        if (!existingUser.getUserName().equals(appUserDTO.getUserName())) {
+            validateUserNameUnique(appUserDTO.getUserName());
+        }
+
         // 3- Mettre à jour les champs
         existingUser.setUserName(appUserDTO.getUserName());
         existingUser.setEmail(appUserDTO.getEmail());
@@ -138,7 +143,7 @@ public class AppUserService {
         // Étape 5 : Ajouter la relation
         currentUser.addFriend(friend);
 
-       // Étape 6 : Sauvegarder l'utilisateur courant pour persister la relation dans la table de jointure
+        // Étape 6 : Sauvegarder l'utilisateur courant pour persister la relation dans la table de jointure
         // Comme la relation est unidirectionnelle, il suffit de sauvegarder currentUser.
         // La table de jointure sera mise à jour automatiquement.
         // Si la relation était bidirectionnelle, il faudrait aussi sauvegarder friend ou utiliser cascade pour propager.
@@ -154,8 +159,5 @@ public class AppUserService {
                 appUser.getBalance(),
                 appUser.getUserCreatedAt()
         );
-
     }
-
-
 }
