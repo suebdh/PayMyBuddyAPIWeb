@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>PayMyBuddy - Profil</title>
     <link rel="stylesheet" th:href="@{/css/styleHeader.css}">
+    <link rel="stylesheet" th:href="@{/css/profil.css}">
 </head>
 <body>
 
@@ -11,8 +12,30 @@
 <div th:replace="~{fragments/header :: header('profil')}"></div>
 
 <main>
-    <h1>Bienvenue - Profil</h1>
-    <p>Contenu page profil… </p>
+
+    <form th:object="${profil}" method="post" th:action="@{/profil}">
+
+        <!-- Champ username -->
+        <div class="form-row">
+            <label for="username">User Name</label>
+            <input type="text" id="username" th:field="*{username}" placeholder="@username  >" required>
+        </div>
+
+        <!-- Champ email (not updatable / readonly) -->
+        <div class="form-row">
+            <label for="email">Mail</label>
+            <input type="email" id="email" th:field="*{email}" placeholder="nom@domain.com  >" readonly>
+        </div>
+
+        <!-- Champ mot de passe + Bouton modifier-->
+        <div class="form-row password-row">
+            <label for="password">Mot de passe</label>
+            <input type="password" id="password" th:field="*{password}" placeholder="mot de passe           >" required>
+            <button type="submit">Modifier</button>
+        </div>
+
+    </form>
+
 </main>
 
 </body>

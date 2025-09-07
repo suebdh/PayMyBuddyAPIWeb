@@ -3,6 +3,7 @@ package com.openclassrooms.PayMyBuddyAPIWeb.service;
 import com.openclassrooms.PayMyBuddyAPIWeb.dto.AppUserDTO;
 import com.openclassrooms.PayMyBuddyAPIWeb.dto.RegisterDTO;
 import com.openclassrooms.PayMyBuddyAPIWeb.entity.AppUser;
+import com.openclassrooms.PayMyBuddyAPIWeb.exception.AuthenticatedUserNotFoundException;
 import com.openclassrooms.PayMyBuddyAPIWeb.exception.EmailAlreadyUsedException;
 import com.openclassrooms.PayMyBuddyAPIWeb.exception.UserNotFoundException;
 import com.openclassrooms.PayMyBuddyAPIWeb.exception.UsernameAlreadyUsedException;
@@ -99,6 +100,16 @@ public class AppUserService {
 
         // 4- Sauvegarder et retourner le DTO
         return convertToDTO(appUserRepository.save(existingUser));
+    }
+
+    public AppUserDTO getAuthenticatedUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName(); // récupère l'email de l'utilisateur connecté
+        return appUserRepository.findByEmail(email)
+                .map(this::convertToDTO)
+                .orElseThrow(() -> new AuthenticatedUserNotFoundException(
+                        "Utilisateur connecté introuvable avec l'email : " + email
+                ));
     }
 
     public void addFriendByEmail(String friendEmail) {

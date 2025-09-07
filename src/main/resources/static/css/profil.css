@@ -1,0 +1,101 @@
+/* 1. Base globale */
+body {
+    font-family: Arial, sans-serif; /* Police de base pour tout le site */
+    background-color: #f8f9fa;      /* Couleur de fond claire */
+    margin: 0;                       /* Supprime les marges par défaut du navigateur */
+    padding: 0;                      /* Supprime le padding par défaut du navigateur */
+}
+
+main {
+    display: flex;
+    flex-direction: column;          /* Empile les enfants verticalement */
+    align-items: center;             /* Centre horizontalement le contenu */
+    padding: 90px 40px 20px;         /* Padding autour du contenu principal */
+}
+
+/* 2. Messages de succès et d'erreur */
+.success-message {
+    color: green;                    /* Texte vert pour succès */
+    text-align: center;               /* Centrage horizontal */
+    margin-bottom: 20px;              /* Espace sous le message */
+}
+
+.error-message {
+    color: red;                       /* Texte rouge pour erreur */
+    text-align: center;               /* Centrage horizontal */
+    margin-bottom: 20px;              /* Espace sous le message */
+}
+
+/* 3. Formulaire */
+form {
+    display: flex;
+    flex-direction: column;          /* Champs empilés verticalement */
+    gap: 15px;                        /* Espace entre les champs */
+    width: 640px;                     /* Largeur fixe du formulaire */
+}
+
+/* 4. Styles des inputs */
+input {
+    padding: 10px;                    /* Espace interne pour le texte */
+    font-size: 1em;                   /* Taille du texte */
+    border-radius: 5px;               /* Coins arrondis */
+    border: 1px solid #ccc;           /* Bordure grise */
+}
+
+/* Chaque ligne du formulaire */
+.form-row {
+    display: flex;
+    align-items: flex-start;          /* Aligne le label et l'input sur le haut de la ligne */
+    margin-bottom: 15px;              /* Espace entre les lignes */
+}
+
+/* Labels avec largeur fixe pour aligner tous les inputs */
+.form-row label {
+    width: 130px;                     /* Largeur fixe pour alignement vertical */
+    margin-right: 10px;               /* Espace entre label et input */
+    font-weight: bold;                /* Texte en gras */
+    font-size: 20px;                  /* Taille du texte */
+}
+
+/* Inputs fixes selon maquette Figma */
+.form-row input {
+    width: 277px;                     /* Largeur exacte de l'input */
+    height: 28px;                     /* Hauteur exacte de l'input */
+    font-size: 20px;                  /* Taille du texte */
+    padding: 0 8px;                   /* Padding horizontal interne */
+    border-radius: 5px;               /* Coins arrondis */
+    border: 1px solid #ccc;           /* Bordure grise */
+    box-sizing: border-box;           /* Inclut padding et border dans la largeur et hauteur */
+}
+
+/* Ligne mot de passe avec bouton */
+.password-row input {
+    flex: none;                       /* L'input ne prend pas tout l'espace disponible */
+    width: 277px;                     /* Largeur identique aux autres inputs */
+    height: 28px;                     /* Hauteur identique aux autres inputs */
+    padding: 0 8px;                   /* Padding horizontal */
+    border-radius: 5px;               /* Coins arrondis */
+    border: 1px solid #ccc;           /* Bordure grise */
+}
+
+/* Bouton de modification à droite du mot de passe */
+.password-row button {
+    margin-left: 10px;                /* Espace entre l'input et le bouton */
+    flex-shrink: 0;                   /* Empêche le bouton de rétrécir */
+    height: 64px;                     /* Hauteur du bouton */
+    width: 147px;                     /* Largeur du bouton */
+    align-self: flex-start;           /* Aligne le bouton en haut de la ligne */
+    padding: 0 20px;                  /* Padding horizontal */
+    border-radius: 5px;               /* Coins arrondis */
+    border: none;                     /* Supprime la bordure par défaut */
+    background: #F69F1D;              /* Couleur orange */
+    color: #fff;                       /* Texte blanc */
+    cursor: pointer;                   /* Curseur pointeur au survol */
+    font-size: 1.5em;                  /* Taille du texte */
+    font-weight: bold;                 /* Texte en gras */
+    transition: background 0.3s;       /* Transition pour le hover */
+}
+
+button:hover {
+    background: #ec9a25;               /* Couleur orange plus claire au survol */
+}
