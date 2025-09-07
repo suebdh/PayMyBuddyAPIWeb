@@ -13,12 +13,17 @@
 
 <main>
 
+    <!-- Messages globaux succès / erreur -->
+    <div th:if="${successMessage}" class="success-message" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="error-message" th:text="${errorMessage}"></div>
+
     <form th:object="${profil}" method="post" th:action="@{/profil}">
 
         <!-- Champ username -->
         <div class="form-row">
             <label for="username">User Name</label>
             <input type="text" id="username" th:field="*{username}" placeholder="@username  >" required>
+            <div class="error-message" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
         </div>
 
         <!-- Champ email (not updatable / readonly) -->
@@ -30,7 +35,11 @@
         <!-- Champ mot de passe + Bouton modifier-->
         <div class="form-row password-row">
             <label for="password">Mot de passe</label>
-            <input type="password" id="password" th:field="*{password}" placeholder="mot de passe           >" required>
+            <div class="input-container">
+                <input type="password" id="password" th:field="*{password}" placeholder="mot de passe           >"
+                       required>
+                <div class="error-message" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+            </div>
             <button type="submit">Modifier</button>
         </div>
 
