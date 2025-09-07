@@ -18,12 +18,14 @@ main {
     color: green;                    /* Texte vert pour succès */
     text-align: center;               /* Centrage horizontal */
     margin-bottom: 20px;              /* Espace sous le message */
+    font-weight: bold;
 }
 
 .error-message {
     color: red;                       /* Texte rouge pour erreur */
     text-align: center;               /* Centrage horizontal */
     margin-bottom: 20px;              /* Espace sous le message */
+    font-weight: bold;
 }
 
 /* 3. Formulaire */
@@ -98,4 +100,21 @@ input {
 
 button:hover {
     background: #ec9a25;               /* Couleur orange plus claire au survol */
+}
+
+.input-container {
+    display: flex;
+    flex-direction: column; /* empile l’input et le message */
+     width: 277px;
+}
+
+.input-container input {
+    height: 28px;
+    font-size: 20px;
+}
+
+input[readonly] {
+    background-color: #e9ecef;  /* gris clair */
+    color: #6c757d;             /* texte gris foncé */
+    cursor: not-allowed;        /* curseur barré au survol */
 }
