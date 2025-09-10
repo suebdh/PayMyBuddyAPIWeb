@@ -13,27 +13,32 @@
 
 <main>
 	<!-- Bloc n°1 : formulaire de transfert -->
-	<div class="transfer-top">
-		<!-- Sélectionner une relation -->
-		<label for="relation-select" class="visually-hidden">Relation</label>
-		<select class="control" name="relation" id="relation-select">
-			<option value="">Sélectionner une relation</option>
-			<option value="laure-anne">Laure-Anne</option>
-			<option value="clara">Clara</option>
-			<option value="luc">Luc</option>
-		</select>
-		
-		<!-- Description -->
-		<label for="description-input" class="visually-hidden">Description</label>
-		<input class="control" type="text" id="description-input" name="description" placeholder="Description"/>
-		
-		<!-- Montant -->
-		<label for="montant-input" class="visually-hidden">Montant (€)</label>
-		<input class="control" type="number" id="montant-input" name="montant" th:value="${#numbers.formatDecimal(0,1,'DEFAULT',2,'DEFAULT')}" min="0" step="0.01" placeholder="0€"/>
-		
-		<!-- Bouton Payer -->
-		<button class="btn-pay">Payer</button>
-	</div>
+	<form th:object="${transferForm}" method="post" action="/transfer">
+		<div class="transfer-top">
+			<!-- Sélectionner une relation -->
+			<label for="relation-select" class="visually-hidden">Relation</label>
+			<select class="control" id="relation-select" th:field="*{relation}">
+				<option value="">Sélectionner une relation</option>
+				<option th:each="friend : ${friends}"
+				        th:value="${friend.userName}"
+				        th:text="${friend.userName}">
+				</option>
+			</select>
+			
+			<!-- Description -->
+			<label for="description-input" class="visually-hidden">Description</label>
+			<input class="control" type="text" id="description-input" th:field="*{description}" placeholder="Description"/>
+			
+			<!-- Montant -->
+			<label for="montant-input" class="visually-hidden">Montant (€)</label>
+			<input class="control" type="number" id="montant-input" th:field="*{montant}"
+			       th:value="${#numbers.formatDecimal(0,1,'DEFAULT',2,'DEFAULT')}" min="0" step="0.01"
+			       placeholder="0€"/>
+			
+			<!-- Bouton Payer -->
+			<button class="btn-pay">Payer</button>
+		</div>
+	</form>
 	
 	<!-- Bloc n°2 : Historique des transactions -->
 	<div class="transactions-wrapper">
