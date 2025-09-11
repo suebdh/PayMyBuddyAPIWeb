@@ -55,20 +55,10 @@
 			</tr>
 			</thead>
 			<tbody>
-			<tr>
-				<th scope="row">Laure-Anne</th>
-				<td>Restaurant</td>
-				<td>10€</td>
-			</tr>
-			<tr>
-				<th scope="row">Clara</th>
-				<td>Voyage</td>
-				<td>25€</td>
-			</tr>
-			<tr>
-				<th scope="row">Luc</th>
-				<td>Billets de cinéma</td>
-				<td>8€</td>
+			<tr th:each="tx : ${transactions}">
+				<th scope="row" th:text="${tx.relation}"></th>
+				<td th:text="${tx.description}"></td>
+				<td th:text="${#numbers.formatDecimal(tx.montant, 1, 'DEFAULT', 2, 'DEFAULT')} + '€'"></td>
 			</tr>
 			</tbody>
 		</table>
