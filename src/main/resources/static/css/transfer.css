@@ -1,0 +1,164 @@
+/* ============================================================
+   VARIABLES GLOBALES
+   ============================================================ */
+:root {
+    --border: #E6E8EB;   /* gris très clair pour les bordures */
+    --card-bg: #FFF;     /* fond blanc des cartes (table, champs) */
+}
+
+/* ============================================================
+   STYLES GÉNÉRAUX DU BODY
+   ============================================================ */
+body {
+    font-family: Inter, Arial, sans-serif;
+    background-color: --card-bg;    /* fond blanc */
+    line-height: 1.5;
+    margin: 0;
+    padding: 0;
+}
+
+main {
+    max-width: 1440px;
+    max-height: 426px;
+    margin: 40px auto; /* centre la zone + espace en haut/bas */
+    padding: 0 24px;   /* marge intérieure gauche/droite */
+}
+
+/* ============================================================
+   UTILITAIRES / CLASSES RÉUTILISABLES
+   ============================================================ */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+.control {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 15px;
+}
+
+.btn-pay {
+    display: inline-block;
+    background: #207FEE; /* couleur principale = bleu bouton */
+    color: white;
+    border: none;
+    padding: 12px 22px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* ============================================================
+   SECTION 1 : FORMULAIRE DE TRANSFERT (.transfer-top)
+   ============================================================ */
+.transfer-top {
+    display: grid;
+    grid-template-columns: 1fr 1fr 140px auto; /* 4 colonnes */
+    gap: 20px;                                  /* espace entre colonnes */
+    align-items: center;                        /* verticalement aligné */
+    margin-top: 8px;
+    margin-bottom: 120px;                       /* espace sous le formulaire */
+}
+
+/* ============================================================
+   SECTION 2 : HISTORIQUE DES TRANSACTIONS (.transactions-wrapper)
+   ============================================================ */
+.transactions-wrapper {
+    border: 1px solid var(--border); /* bordure visible sur les 4 côtés */
+    border-radius: 10px;        /* arrondir les coins */
+    overflow: hidden;           /* applique l'arrondi aussi au contenu */
+    padding: 16px;
+}
+
+/* ============================================================
+   TABLEAU (.transactions-table)
+   ============================================================ */
+.transactions-table {
+    width: 100%;
+    border-collapse: collapse; /* supprime les espaces entre cellules */
+    margin: 0;
+    background: var(--card-bg);
+    border: none;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* ------------------------------------------------------------
+   Caption / Titre du tableau
+   ------------------------------------------------------------ */
+.transactions-table caption {
+    text-align: left;
+    font-weight: 700;
+    font-size: 24px;
+    padding-bottom: 20px; /* espace sous le titre */
+}
+
+/* ------------------------------------------------------------
+   En-tête du tableau (thead)
+   ------------------------------------------------------------ */
+.transactions-table thead tr {
+    border-bottom: 1px solid var(--border);
+    background: #fff; /* fond blanc */
+}
+
+.transactions-table th {
+    font-weight: 600;
+    font-size: 24px;
+    text-align: left;
+    padding: 16px 24px;
+}
+
+/* ------------------------------------------------------------
+   Cellules du corps (tbody)
+   ------------------------------------------------------------ */
+.transactions-table td,
+.transactions-table th[scope="row"] {
+    padding: 16px 24px;
+    vertical-align: middle;
+    font-size: 22px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.transactions-table td:first-child,
+.transactions-table th:first-child {
+    padding-left: 32px;
+}
+
+.transactions-table td:last-child,
+.transactions-table th:last-child {
+    padding-right: 32px;
+    text-align: right; /* aligner les montants à droite */
+}
+
+/* ------------------------------------------------------------
+   Dernière ligne : suppression bordure
+   ------------------------------------------------------------ */
+.transactions-table tbody tr:last-child td,
+.transactions-table tbody tr:last-child th {
+    border-bottom: none;
+}
+
+/* ------------------------------------------------------------
+   Effet survol des lignes
+   ------------------------------------------------------------ */
+.transactions-table tbody tr:hover {
+    background: #FDFDFF;
+}
+
+/* ------------------------------------------------------------
+   Note ou pied de tableau (Utile plus tard dans la pagination)
+   ------------------------------------------------------------ */
+.transactions-table + .table-note {
+    margin-top: 12px;
+    color: #6b7280;
+    font-size: 13px;
+}

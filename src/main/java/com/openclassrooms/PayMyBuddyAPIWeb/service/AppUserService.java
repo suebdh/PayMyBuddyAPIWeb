@@ -160,4 +160,15 @@ public class AppUserService {
                 appUser.getUserCreatedAt()
         );
     }
+
+    public List<AppUser> getFriendsForCurrentUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName(); // email de l’utilisateur connecté
+
+        AppUser currentUser = appUserRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("Utilisateur courant introuvable"));
+
+        // Convertir le Set en List pour l'utiliser dans Thymeleaf
+        return currentUser.getFriends().stream().toList();
+    }
 }

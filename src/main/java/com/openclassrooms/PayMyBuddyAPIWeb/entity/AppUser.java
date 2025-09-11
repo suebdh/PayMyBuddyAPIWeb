@@ -1,6 +1,7 @@
 package com.openclassrooms.PayMyBuddyAPIWeb.entity;
 
 import jakarta.persistence.*;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
@@ -10,6 +11,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "app_user")
+@Setter
 public class AppUser {
 
     @Id
