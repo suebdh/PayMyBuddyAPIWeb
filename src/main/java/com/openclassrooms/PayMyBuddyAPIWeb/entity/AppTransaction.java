@@ -3,7 +3,7 @@ package com.openclassrooms.PayMyBuddyAPIWeb.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -24,12 +24,8 @@ public class AppTransaction {
     @Column(name = "amount", nullable = false)
     private BigDecimal amountTransaction;
 
-    @Column(nullable = false, precision = 10, scale = 3)
-    @ColumnDefault("0.005")
-    private BigDecimal fees;
-
-    @Column(name = "created_at", nullable = false, updatable = false,
-            columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @Column(name = "created_at", nullable = false, updatable = false)
+    @CreationTimestamp
     private LocalDateTime transactionCreatedAt;
 
     @ManyToOne (fetch = FetchType.EAGER)
