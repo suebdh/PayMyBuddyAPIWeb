@@ -1,6 +1,7 @@
 package com.openclassrooms.PayMyBuddyAPIWeb.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -12,6 +13,7 @@ import java.util.Set;
 @Entity
 @Table(name = "app_user")
 @Setter
+@Getter
 public class AppUser {
 
     @Id
@@ -43,6 +45,14 @@ public class AppUser {
             inverseJoinColumns =@JoinColumn(name="friend_id", foreignKey = @ForeignKey(name = "fk_user_friendship_friend")))
     private Set<AppUser> friends = new HashSet<>(); //collection unique sans importance d'ordre
 
+    //Toutes les transactions telles que l'utilisateur est l'expéditeur (sender dans AppTransaction).
+    @OneToMany(mappedBy = "sender", fetch = FetchType.LAZY)
+    private Set<AppTransaction> sentTransactions = new HashSet<>();
+
+    //Toutes les transactions telles que l'utilisateur est le destinataire (receiver dans AppTransaction).
+    @OneToMany(mappedBy = "receiver", fetch = FetchType.LAZY)
+    private Set<AppTransaction> receivedTransactions = new HashSet<>();
+
     public void addFriend(AppUser friend) {
         // Ajouter l'ami à la liste des amis de l'utilisateur courant
         friends.add(friend);
@@ -53,62 +63,6 @@ public class AppUser {
     public void removeFriend(AppUser friend) {
         friends.remove(friend);
         friend.getFriends().remove(this);
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public BigDecimal getBalance() {
-        return balance;
-    }
-
-    public LocalDateTime getUserCreatedAt() {
-        return userCreatedAt;
-    }
-
-    public Set<AppUser> getFriends() {
-        return friends;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public void setBalance(BigDecimal balance) {
-        this.balance = balance;
-    }
-
-    public void setUserCreatedAt(LocalDateTime userCreatedAt) {
-        this.userCreatedAt = userCreatedAt;
-    }
-
-    public void setFriends(Set<AppUser> friends) {
-        this.friends = friends;
     }
 
     public AppUser(int userId, String userName, String email, String password, BigDecimal balance, LocalDateTime userCreatedAt, Set<AppUser> friends) {

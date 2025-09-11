@@ -46,7 +46,6 @@ CREATE TABLE IF NOT EXISTS `app_transaction` (
   `user_id_receiver` INT NOT NULL,
   `description` VARCHAR(255) NULL,
   `amount` DECIMAL(10,2) NOT NULL,
-  `fees` DECIMAL(10,3) NOT NULL DEFAULT 0.005,
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_transaction_sender`

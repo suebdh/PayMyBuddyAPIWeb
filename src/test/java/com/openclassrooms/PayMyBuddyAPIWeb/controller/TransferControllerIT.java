@@ -1,6 +1,9 @@
 package com.openclassrooms.PayMyBuddyAPIWeb.controller;
 
+import com.openclassrooms.PayMyBuddyAPIWeb.dto.TransferHistoryDTO;
+import com.openclassrooms.PayMyBuddyAPIWeb.entity.AppTransaction;
 import com.openclassrooms.PayMyBuddyAPIWeb.entity.AppUser;
+import com.openclassrooms.PayMyBuddyAPIWeb.repository.AppTransactionRepository;
 import com.openclassrooms.PayMyBuddyAPIWeb.repository.AppUserRepository;
 import com.openclassrooms.PayMyBuddyAPIWeb.service.AppUserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,15 +37,14 @@ public class TransferControllerIT {
     @Autowired
     private AppUserRepository appUserRepository;
 
-    private AppUser currentUser;
-    private AppUser friend1;
-    private AppUser friend2;
+    @Autowired
+    private AppTransactionRepository appTransactionRepository;
 
     @BeforeEach
     void setup() {
 
         // créer l'utilisateur courant
-        currentUser = new AppUser();
+        AppUser currentUser = new AppUser();
         currentUser.setUserName("testuser");
         currentUser.setPassword("Sst5892s!ST");
         currentUser.setBalance(BigDecimal.ZERO);
@@ -50,24 +52,46 @@ public class TransferControllerIT {
         appUserRepository.save(currentUser);
 
         // créer les amis
-        friend1 = new AppUser();
+        AppUser friend1 = new AppUser();
         friend1.setUserName("amiTest1");
         friend1.setBalance(BigDecimal.ZERO);
         friend1.setPassword("Set5892s?sE");
         friend1.setEmail("friend1@example.com");
         appUserRepository.save(friend1);
 
-        friend2 = new AppUser();
+        AppUser friend2 = new AppUser();
         friend2.setUserName("amiTest2");
         friend2.setBalance(BigDecimal.ZERO);
         friend2.setPassword("Fet5892s?sF");
         friend2.setEmail("friend2@example.com");
         appUserRepository.save(friend2);
 
-        // **Ajouter les amis à l'utilisateur courant**
+        // Ajouter les amis à l'utilisateur courant
         currentUser.addFriend(friend1);
         currentUser.addFriend(friend2);
         appUserRepository.save(currentUser); // persister la relation dans la table de jointure
+
+        // friend1 envoie de l'argent à currentUser
+        AppTransaction tx1 = new AppTransaction();
+        tx1.setSender(friend1);
+        tx1.setReceiver(currentUser);
+        tx1.setDescription("Cadeau");
+        tx1.setAmountTransaction(BigDecimal.valueOf(20));
+        currentUser.getReceivedTransactions().add(tx1);
+        friend1.getSentTransactions().add(tx1);
+
+        // currentUser envoie à friend2
+        AppTransaction tx2 = new AppTransaction();
+        tx2.setSender(currentUser);
+        tx2.setReceiver(friend2);
+        tx2.setDescription("Repas");
+        tx2.setAmountTransaction(BigDecimal.valueOf(15.00));
+        currentUser.getSentTransactions().add(tx2);
+        friend2.getReceivedTransactions().add(tx2);
+
+        //Sauvegarder ces transactions
+        appTransactionRepository.save(tx1);
+        appTransactionRepository.save(tx2);
     }
 
     @Test
@@ -89,6 +113,22 @@ public class TransferControllerIT {
                     assertEquals(2, friendsFromModel.size());
                     assertEquals("amiTest1", friendsFromModel.get(0).getUserName());
                     assertEquals("amiTest2", friendsFromModel.get(1).getUserName());
+
+
+                    // Vérifier l'historique des transactions
+                    List<TransferHistoryDTO> transactions = (List<TransferHistoryDTO>) mvcResult.getModelAndView().getModel().get("transactions");
+
+                    TransferHistoryDTO sentTx = transactions.stream()
+                            .filter(tx -> tx.getRelation().equals("amiTest2"))
+                            .findFirst().orElseThrow();
+                    //assertEquals(BigDecimal.valueOf(-15.00), sentTx.getMontant());
+                    assertEquals(0, sentTx.getMontant().compareTo(BigDecimal.valueOf(-15)));
+
+                    TransferHistoryDTO receivedTx = transactions.stream()
+                            .filter(tx -> tx.getRelation().equals("amiTest1"))
+                            .findFirst().orElseThrow();
+                    //assertEquals(BigDecimal.valueOf(20.00), receivedTx.getMontant());
+                    assertEquals(0, receivedTx.getMontant().compareTo(BigDecimal.valueOf(20)));
                 });
     }
 }
