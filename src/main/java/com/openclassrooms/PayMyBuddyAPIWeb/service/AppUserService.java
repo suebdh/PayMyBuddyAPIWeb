@@ -2,6 +2,7 @@ package com.openclassrooms.PayMyBuddyAPIWeb.service;
 
 import com.openclassrooms.PayMyBuddyAPIWeb.dto.AppUserDTO;
 import com.openclassrooms.PayMyBuddyAPIWeb.dto.RegisterDTO;
+import com.openclassrooms.PayMyBuddyAPIWeb.dto.TransferHistoryDTO;
 import com.openclassrooms.PayMyBuddyAPIWeb.entity.AppUser;
 import com.openclassrooms.PayMyBuddyAPIWeb.exception.AuthenticatedUserNotFoundException;
 import com.openclassrooms.PayMyBuddyAPIWeb.exception.EmailAlreadyUsedException;
@@ -170,5 +171,39 @@ public class AppUserService {
 
         // Convertir le Set en List pour l'utiliser dans Thymeleaf
         return currentUser.getFriends().stream().toList();
+    }
+
+    public List<TransferHistoryDTO> getTransactionHistoryForCurrentUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+
+        AppUser currentUser = appUserRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("Utilisateur courant introuvable"));
+
+        // Récupérer toutes les transactions envoyées (l'utilisateur est l'expéditeur)
+        List<TransferHistoryDTO> sent = currentUser.getSentTransactions().stream()
+                .map(tx -> new TransferHistoryDTO(
+                        tx.getReceiver().getUserName(), //celui qui a reçu
+                        tx.getDescription(),
+                        tx.getAmountTransaction().negate() // montant négatif, car l'utilisateur a payé
+                ))
+                .toList();
+
+        // Récupérer toutes les transactions reçues (l'utilisateur est le destinataire)
+        List<TransferHistoryDTO> received = currentUser.getReceivedTransactions().stream()
+                .map(tx -> new TransferHistoryDTO(
+                        tx.getSender().getUserName(), // celui qui a envoyé
+                        tx.getDescription(),
+                        tx.getAmountTransaction() // montant positif, car l'utilisateur l'a reçu
+                ))
+                .toList();
+
+        // Fusionner les deux
+        List<TransferHistoryDTO> all = new java.util.ArrayList<>();
+        all.addAll(sent);
+        all.addAll(received);
+
+
+        return all;
     }
 }
