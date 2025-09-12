@@ -60,11 +60,6 @@ public class AppUser {
         // car on souhaite garder la relation unidirectionnelle (uniquement pour gérer l'ajout de bénéficiaires dans le contexte des transferts d'argent)
     }
 
-    public void removeFriend(AppUser friend) {
-        friends.remove(friend);
-        friend.getFriends().remove(this);
-    }
-
     public AppUser(int userId, String userName, String email, String password, BigDecimal balance, LocalDateTime userCreatedAt, Set<AppUser> friends) {
         this.userId = userId;
         this.userName = userName;

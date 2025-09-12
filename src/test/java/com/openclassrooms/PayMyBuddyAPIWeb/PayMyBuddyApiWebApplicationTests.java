@@ -8,6 +8,13 @@ class PayMyBuddyApiWebApplicationTests {
 
 	@Test
 	void contextLoads() {
+		// ce test reste utile pour vérifier le démarrage du contexte Spring
+
+	}
+
+	@Test
+	void mainMethodExecutes() {
+		PayMyBuddyApiWebApplication.main(new String[]{});
 	}
 
 }

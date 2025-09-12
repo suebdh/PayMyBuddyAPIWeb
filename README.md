@@ -1,7 +1,6 @@
 # Pay My Buddy
 
-Application web permettant aux utilisateurs de gérer leurs finances personnelles et d’effectuer des paiements sécurisés
-à leurs amis.
+Application web Java avec Spring Boot permettant aux utilisateurs d'envoyer des paiements sécurisés à leurs amis
 
 ---
 
@@ -20,18 +19,24 @@ Application web permettant aux utilisateurs de gérer leurs finances personnelle
 
 ## Description
 
-**Pay My Buddy** est une application web Java avec Spring Boot permettant :
+**Pay My Buddy** est une application web Java développée avec **Spring Boot** permettant aux utilisateurs d'envoyer des paiements sécurisés à leurs amis.
 
-- La gestion d’un compte utilisateur et de ses informations personnelles.
-- Le suivi des transactions financières.
-- L’envoi d’argent sécurisé à ses amis.
-- L’alimentation du compte par virement bancaire.
+Elle permet notamment :
+- La gestion d'un compte utilisateur et de ses informations personnelles (nom d'utilisateur, mot de passe).
+- L'ajout de nouveaux amis à partir de leur adresse email.
+- L'envoi d'argent sécurisé à ses amis.
+- Le suivi détaillé des transactions financières.
 
-Ce projet comprend :
+L’application est conçue selon une architecture **Spring MVC** :
+- Les vues sont générées côté serveur avec **Thymeleaf**.
+- Les contrôleurs gèrent les requêtes HTTP et préparent les données pour les vues Thymeleaf.
+- La logique métier est encapsulée dans les services, qui sont appelés par les contrôleurs.
+- L'application génère les pages HTML côté serveur avec **Thymeleaf** via Spring MVC, ce n’est donc pas une API REST renvoyant du JSON.
 
-1. **Une base de données relationnelle** conçue à partir d’un Modèle Physique de Données (MPD) optimisé et sécurisé.
-2. **Une application web** avec couche d’accès aux données (DAL), logique métier et interface utilisateur inspirée des
-   maquettes Figma fournies.
+Ce projet comprend également :
+1. **Une base de données relationnelle** conçue à partir d'un Modèle Physique de Données (MPD) optimisé et sécurisé.
+2. **Une application web** avec couche d'accès aux données (DAL), logique métier et interface utilisateur inspirée des maquettes Figma fournies.
+
 
 ---
 
@@ -40,13 +45,13 @@ Ce projet comprend :
 - Concevoir et implémenter une base de données sécurisée.
 - Développer une application web avec **Java / Spring Boot**.
 - Mettre en place la gestion des transactions financières.
-- Respecter les bonnes pratiques d’ergonomie, d’accessibilité (WCAG) et de sécurité.
+- Respecter les bonnes pratiques d'ergonomie, d'accessibilité (WCAG) et de sécurité.
 
 ---
 
 ## Architecture
 
-L’application est organisée en plusieurs couches :
+L'application est organisée en plusieurs couches :
 
 - **Controller** : Gestion des requêtes HTTP et communication avec la couche service.
 - **Service** : Contient la logique métier.
@@ -65,7 +70,7 @@ L’application est organisée en plusieurs couches :
 - **Git** pour le versionning
 - **JUnit 5** / **Mockito** / **Spring Boot Test** pour les tests unitaires et les tests d'intégration
 - **Jacoco** pour la couverture de code
-- **Log4j2** pour le logging
+- **Logback** pour la journalisation
 
 ---
 
@@ -97,8 +102,9 @@ L’application est organisée en plusieurs couches :
       ```
 
 2. **Configurer les identifiants dans src/main/resources/application.properties**
-Important : Créer deux variables d'environnement système DB_USERNAME et DB_PASSWORD avant de lancer l'application
-   - DB_USERNAME : le nom d’utilisateur MySQL
+
+   Important : Créer deux variables d'environnement système DB_USERNAME et DB_PASSWORD avant de lancer l'application
+   - DB_USERNAME : le nom d'utilisateur MySQL
    - DB_PASSWORD : le mot de passe MySQL
       ```properties
       spring.datasource.url=jdbc:mysql://localhost:3306/paymybuddy?serverTimezone=UTC
@@ -108,11 +114,11 @@ Important : Créer deux variables d'environnement système DB_USERNAME et DB_PAS
       spring.jpa.hibernate.ddl-auto=update
       spring.jpa.show-sql=true
 
-3. **Lancer l’application**
+3. **Lancer l'application**
     ```bash
     mvn spring-boot:run
 
-4. **Accéder à l’application**
+4. **Accéder à l'application**
    
    - URL : http://localhost:8080 (port de l'application web Spring Boot)
    - Port MySQL : 3306 (pour la base de données)
@@ -120,14 +126,14 @@ Important : Créer deux variables d'environnement système DB_USERNAME et DB_PAS
 ## Base de données
 
 Le **Modèle Physique de Données (MPD)** définit la structure des principales tables et les relations utilisées par
-l’application **Pay My Buddy**.
+l'application **Pay My Buddy**.
 
 ### Tables principales
 
-- **`app_user`** : Stocke les informations des utilisateurs (nom, email, mot de passe chiffré, solde, date de création).
-- **`app_transaction`** : Historique des transactions effectuées et reçues (description, montant, frais, date de
+- **`app_user`** : Stocke les informations des utilisateurs (nom d'utilisateur, email, mot de passe chiffré, solde, date de création).
+- **`app_transaction`** : Historique des transactions effectuées et reçues (expéditeur, destinataire, description, montant, date de
   création).
-- **`user_friendship`** : Liste des relations d’amitié enregistrées entre les utilisateurs.
+- **`user_friendship`** : Liste des relations d'amitié enregistrées entre les utilisateurs.
 
 ### Diagramme EER
 
@@ -137,22 +143,23 @@ Le schéma ci-dessous illustre les tables et leurs relations dans la base de don
 
 > **Note :**
 > - Diagramme généré à partir de **MySQL Workbench**.
-> - Le fichier source est disponible dans `docs/PayMyBuddy_MPD.mwb` pour modification si nécessaire.
+> - Le fichier source est disponible dans `docs/EER_PayMyBuddy.mwb` pour modification si nécessaire.
 > - Ce diagramme pourra être mis à jour en fonction des évolutions du modèle.
 
 ### Création de la base de données
 
-Créez le schéma de la base de données MySQL à l’aide du fichier :  
+Créez le schéma de la base de données MySQL à l'aide du fichier :  
 `/src/main/resources/script/schema.sql`.
 
-## Usage
+## Scénario Utilisateur
 
-- Créer un compte utilisateur
-- Se connecter avec ses identifiants
-- Ajouter un ami à partir de son adresse email
-- Envoyer de l’argent à un ami existant
-- Consulter l’historique de ses transactions
-- Alimenter son compte via un compte bancaire lié
+Un utilisateur peut :
+
+1. Créer un compte et se connecter à l'application de manière sécurisée.
+2. Mettre à jour son profil.
+3. Rechercher et ajouter des amis via leur adresse email.
+4. Effectuer un transfert d'argent vers l'un de ses amis et voir son solde se mettre à jour.
+5. Consulter l'historique détaillé de toutes ses transactions (paiements envoyés et reçus).
 
 ## Fonctionnalités
 
@@ -165,20 +172,27 @@ Créez le schéma de la base de données MySQL à l’aide du fichier :
 
 ## API Endpoints
 
-| Method | URL                   | Paramèters                | Description & Details                               |
-|--------|-----------------------|---------------------------|-----------------------------------------------------|
-| POST   | `/api/users/register` | -                         | crée un nouvel utilisateur                          |
-| POST   | `/api/users/login`    | -                         | authentifie un utilisateur et retourne un token JWT |
-| GET    | `/api/users/me`       | -                         | récupère les informations de l’utilisateur connecté |
-| POST   | `/api/contacts`       | `email (body)`            | ajoute un ami par email                             |
-| GET    | `/api/contacts`       | -                         | liste des amis                                      |
-| POST   | `/api/transactions`   | `destinataireId, montant` | 	envoie de l’argent à un ami                        |
-| GET    | `/api/transactions`   | -                         | historique des transactions de l’utilisateur        |
+| Method                          | URL         | Paramèters                                   | Description & Details                                                     |
+|---------------------------------|-------------|----------------------------------------------|---------------------------------------------------------------------------|
+| GET                             | `/register` |                                              | affiche le formulaire d'inscription                                       |
+| POST                            | `/register` | `username, email, password`                  | crée un nouvel utilisateur                                                |
+| GET                             | `/login`    |                                              | affiche le formulaire de connexion un utilisateur                         |
+| POST                            | `/login`    | `username, password`                         | authentifie l'utilisateur (Spring Security)                               |
+| POST                            | `/logout`   |                                              | déconnecte l'utilisateur                                                  |
+| GET                             | `/profil`   | -                                            | affiche le profil de l'utilisateur connecté                               |
+| POST                            | `/profil`   | `username et/ou password `                   | met à jour le profil (username, mot de passe)                             |
+| GET                             | `/relation` |                                              | affiche le formulaire d'ajout d'ami                                       |
+| POST                            | `/relation` | `email`                                      | ajoute un ami par email                                                   |
+| GET                             | `/transfer` | -                                            | affiche la page de transfer (liste des amis, historique des transactions) |
+| POST(en cours d'implémentation) | `/transfer` | `UsernameDestinataire, description, montant` | envoie de l'argent à un ami                                               |
+
 
 ## Améliorations futures
 
 - Interface responsive
 - Notifications (email / push) pour les paiements
-- Export de l’historique en PDF ou CSV
+- Export de l'historique en PDF ou CSV
 - Support multi-devises
-- Intégration avec d’autres moyens de paiement
+- Supprimer un ami
+- Intégration avec des passerelles de paiement externes (ex : Stripe, PayPal, SEPA) pour connecter les transferts internes à des transactions financières réelles
+- Re-factorisation des endpoints en API REST (JSON) pour usage par un frontend ou mobile app
