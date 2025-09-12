@@ -1,6 +1,5 @@
 package com.openclassrooms.PayMyBuddyAPIWeb.controller;
 
-import com.openclassrooms.PayMyBuddyAPIWeb.dto.LoginDTO;
 import com.openclassrooms.PayMyBuddyAPIWeb.service.LoginService;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
