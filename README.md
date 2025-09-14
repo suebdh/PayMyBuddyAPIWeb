@@ -196,3 +196,7 @@ Un utilisateur peut :
 - Supprimer un ami
 - Intégration avec des passerelles de paiement externes (ex : Stripe, PayPal, SEPA) pour connecter les transferts internes à des transactions financières réelles
 - Re-factorisation des endpoints en API REST (JSON) pour usage par un frontend ou mobile app
+- Gestion avancée des comptes utilisateurs :
+  - Compte non activé après inscription (activation par email)
+  - Compte suspendu ou désactivé par un administrateur
+  - Compte expiré (ex : abonnements temporaires)
