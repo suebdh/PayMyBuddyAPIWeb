@@ -9,6 +9,7 @@ import com.openclassrooms.PayMyBuddyAPIWeb.exception.EmailAlreadyUsedException;
 import com.openclassrooms.PayMyBuddyAPIWeb.exception.UserNotFoundException;
 import com.openclassrooms.PayMyBuddyAPIWeb.exception.UsernameAlreadyUsedException;
 import com.openclassrooms.PayMyBuddyAPIWeb.repository.AppUserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,8 +18,6 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class AppUserService {
@@ -41,28 +40,6 @@ public class AppUserService {
         if (appUserRepository.findByUserName(userName).isPresent()) {
             throw new UsernameAlreadyUsedException("Nom d'utilisateur déjà utilisé !");
         }
-    }
-
-    public List<AppUserDTO> getAllUsers() {
-        return appUserRepository.findAll()
-                .stream()  // Transforme la liste en Stream
-                .map(this::convertToDTO) // Convertit chaque AppUser en AppUserDTO
-                .collect(Collectors.toList()); // Re-transforme en List
-    }
-
-    public Optional<AppUserDTO> getUserById(int id) {
-        return appUserRepository.findById(id)
-                .map(this::convertToDTO);
-    }
-
-    public Optional<AppUserDTO> getUserByUserName(String name) {
-        return appUserRepository.findByUserName(name)
-                .map(this::convertToDTO);
-    }
-
-    public Optional<AppUserDTO> getUserByEmail(String email) {
-        return appUserRepository.findByEmail(email)
-                .map(this::convertToDTO);
     }
 
     public void createUser(RegisterDTO registerDTO) {
@@ -118,6 +95,7 @@ public class AppUserService {
                 ));
     }
 
+    @Transactional
     public void addFriendByEmail(String friendEmail) {
         // Étape 1 : Récupérer l'utilisateur courant connecté
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
