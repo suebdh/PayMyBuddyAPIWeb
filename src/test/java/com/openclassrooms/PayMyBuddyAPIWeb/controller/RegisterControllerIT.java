@@ -1,16 +1,12 @@
 package com.openclassrooms.PayMyBuddyAPIWeb.controller;
 
 import com.openclassrooms.PayMyBuddyAPIWeb.dto.RegisterDTO;
-import com.openclassrooms.PayMyBuddyAPIWeb.exception.EmailAlreadyUsedException;
-import com.openclassrooms.PayMyBuddyAPIWeb.exception.UsernameAlreadyUsedException;
+import com.openclassrooms.PayMyBuddyAPIWeb.repository.AppUserRepository;
 import com.openclassrooms.PayMyBuddyAPIWeb.service.AppUserService;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -29,15 +25,11 @@ public class RegisterControllerIT {
     private MockMvc mockMvc;
 
     @Autowired
-    private AppUserService appUserService;
+    private AppUserService appUserService;// version réelle du service
 
-    @TestConfiguration
-    static class TestConfig {
-        @Bean
-        public AppUserService appUserService() {
-            return Mockito.mock(AppUserService.class); // mock injecté
-        }
-    }
+    @Autowired
+    private AppUserRepository appUserRepository;
+
 
     @Test
     public void showRegisterForm_shouldReturnRegisterView() throws Exception {
@@ -57,7 +49,9 @@ public class RegisterControllerIT {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/login?registered"));
 
-        Mockito.verify(appUserService).createUser(Mockito.any(RegisterDTO.class));
+        //Mockito.verify(appUserService).createUser(Mockito.any(RegisterDTO.class));
+        // Vérifie que l'utilisateur a bien été créé
+        assert(appUserRepository.findByEmail("testemail@example.com").isPresent());
     }
 
     @Test
@@ -75,17 +69,14 @@ public class RegisterControllerIT {
     @Test
     public void registerUser_wthEmailAlreadyUsed_shouldReturnRegisterViewWithErrors() throws Exception {
 
-        // Préparer un DTO avec un email déjà utilisé
-        String usedEmail = "existing@example.com";
+        // Crée déjà un utilisateur avec cet email
+        appUserService.createUser(new RegisterDTO("user1", "duplicate@example.com", "Password123!"));
 
-        // Simuler que le service lève une exception EmailAlreadyUsedException
-        Mockito.doThrow(new EmailAlreadyUsedException("Email already used"))
-                .when(appUserService).createUser(Mockito.any(RegisterDTO.class));
 
         mockMvc.perform(post("/register")
                         .with(csrf())
                         .param("userName", "newUser")
-                        .param("email", usedEmail)
+                        .param("email", "duplicate@example.com")
                         .param("password", "Password123!"))
                 .andExpect(status().isOk()) // reste sur la vue register (pas de redirection)
                 .andExpect(view().name("register"))
@@ -96,16 +87,13 @@ public class RegisterControllerIT {
     @Test
     public void registerUser_withUsernameAlreadyUsed_shouldReturnRegisterViewWithErrors() throws Exception {
 
-        // Préparer un DTO avec un username déjà utilisé
-        String usedUsername = "existingUser";
+        // Crée déjà un utilisateur avec ce username
+        appUserService.createUser(new RegisterDTO("existingUser", "user1@example.com", "Password123!"));
 
-        // Simuler que le service lève une exception UsernameAlreadyUsedException
-        Mockito.doThrow(new UsernameAlreadyUsedException("Username already used"))
-                .when(appUserService).createUser(Mockito.any(RegisterDTO.class));
 
         mockMvc.perform(post("/register")
                         .with(csrf())
-                        .param("userName", usedUsername)
+                        .param("userName", "existingUser")
                         .param("email", "newemail@example.com")
                         .param("password", "Password123!"))
                 .andExpect(status().isOk()) // reste sur la vue register
