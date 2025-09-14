@@ -1,21 +1,19 @@
 package com.openclassrooms.PayMyBuddyAPIWeb.controller;
 
+import com.openclassrooms.PayMyBuddyAPIWeb.dto.RegisterDTO;
 import com.openclassrooms.PayMyBuddyAPIWeb.dto.RelationDTO;
-import com.openclassrooms.PayMyBuddyAPIWeb.exception.UserNotFoundException;
+import com.openclassrooms.PayMyBuddyAPIWeb.exception.EmailAlreadyUsedException;
 import com.openclassrooms.PayMyBuddyAPIWeb.service.AppUserService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.mockito.Mockito.doNothing;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -25,21 +23,29 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles(profiles = "test")
-@WithMockUser // utilisateur connecté par défaut
+@WithMockUser(username = "current@example.com") // simule un utilisateur connecté
 public class RelationControllerIT {
 
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
-    private AppUserService appUserService; // ce sera le mock injecté
+    private AppUserService appUserService;
 
-    @TestConfiguration
-    static class TestConfig {
-        @Bean
-        public AppUserService appUserService() {
-            return Mockito.mock(AppUserService.class); // le mock est injecté
-        }
+    @BeforeEach
+    void setUp() {
+        //appUserService.deleteAllUsers(); // purge la base test
+        // création des utilisateurs courant et ami
+        // Crée l'utilisateur courant uniquement s'il n'existe pas déjà
+        try {
+            appUserService.createUser(new RegisterDTO("CurrentUser", "current@example.com", "Password123!"));
+        } catch (EmailAlreadyUsedException ignored) {}
+
+        // Crée l'ami uniquement s'il n'existe pas déjà
+        try {
+            appUserService.createUser(new RegisterDTO("FriendUser", "friend@example.com", "Password123!"));
+        } catch (EmailAlreadyUsedException ignored) {}
+
     }
 
     // =======================
@@ -90,12 +96,10 @@ public class RelationControllerIT {
     @Test
     @DisplayName("POST /relation avec email valide → succès")
     void postRelation_validEmail_shouldRedirectWithSuccess() throws Exception {
-        // Pré-requis : alice@example.com existe en DB
-        doNothing().when(appUserService).addFriendByEmail("alice@example.com");
 
         mockMvc.perform(post("/relation")
                         .with(csrf())
-                        .param("email", "alice@example.com"))
+                        .param("email", "friend@example.com"))// ami créé en @BeforeEach
                 .andDo(print())
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/relation?success"))
@@ -103,53 +107,55 @@ public class RelationControllerIT {
     }
 
     @Test
-    @DisplayName("POST /relation avec exception inattendue → redirige avec message générique")
-    void postRelation_unexpectedException_shouldRedirectWithError() throws Exception {
-        Mockito.doThrow(new RuntimeException("Erreur inattendue"))
-                .when(appUserService).addFriendByEmail("bob@example.com");
-
-        mockMvc.perform(post("/relation")
-                        .with(csrf())
-                        .param("email", "bob@example.com"))
-                .andDo(print())
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/relation?success"))
-                .andExpect(flash().attributeExists("errorMessage"));
-    }
-
-    @Test
-    @DisplayName("POST /relation quand utilisateur introuvable → redirige avec erreur sur le champ email")
+    @DisplayName("POST /relation avec utilisateur introuvable → erreur")
     void postRelation_userNotFound_shouldRedirectWithBindingError() throws Exception {
-        // Stub du service pour lever UserNotFoundException
-        Mockito.doThrow(new UserNotFoundException("Utilisateur introuvable"))
-                .when(appUserService).addFriendByEmail("inconnu@example.com");
-
         mockMvc.perform(post("/relation")
                         .with(csrf())
-                        .param("email", "inconnu@example.com"))
+                        .param("email", "inconnu@example.com")) // email inexistant
                 .andDo(print())
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/relation")) // correspond au redirect du catch
+                .andExpect(redirectedUrl("/relation"))
                 .andExpect(flash().attributeExists("relationDto"))
                 .andExpect(flash().attributeExists("org.springframework.validation.BindingResult.relationDto"));
     }
 
     @Test
-    @DisplayName("POST /relation avec doublon ou auto-ajout → redirige avec erreur sur le champ email")
-    void postRelation_illegalStateOrArgument_shouldRedirectWithBindingError() throws Exception {
-        // Stub du service pour lever une exception logique
-        Mockito.doThrow(new IllegalArgumentException("Impossible d'ajouter cet utilisateur"))
-                .when(appUserService).addFriendByEmail("doublon@example.com");
-
+    @DisplayName("POST /relation auto-ajout → erreur")
+    void postRelation_addSelf_shouldRedirectWithBindingError() throws Exception {
         mockMvc.perform(post("/relation")
                         .with(csrf())
-                        .param("email", "doublon@example.com"))
+                        .param("email", "current@example.com")) // email de l'utilisateur connecté
                 .andDo(print())
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/relation")) // correspond au redirect du catch
+                .andExpect(redirectedUrl("/relation"))
                 .andExpect(flash().attributeExists("relationDto"))
                 .andExpect(flash().attributeExists("org.springframework.validation.BindingResult.relationDto"));
     }
 
+
+    @Test
+    @DisplayName("POST /relation avec doublon → erreur")
+    void postRelation_duplicateFriend_shouldRedirectWithBindingError() throws Exception {
+        // Crée un ami temporaire uniquement pour ce test
+        RegisterDTO tempFriendDTO = new RegisterDTO(
+                "TempFriend",
+                "tempfriend@example.com",
+                "Password123!"
+        );
+        appUserService.createUser(tempFriendDTO);
+
+        // Ajouter cet ami une première fois → succès
+        appUserService.addFriendByEmail("tempfriend@example.com");
+
+        // Essayer de l’ajouter une deuxième fois → doit provoquer IllegalStateException
+        mockMvc.perform(post("/relation")
+                        .with(csrf())
+                        .param("email", "tempfriend@example.com"))
+                .andDo(print())
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/relation"))
+                .andExpect(flash().attributeExists("relationDto"))
+                .andExpect(flash().attributeExists("org.springframework.validation.BindingResult.relationDto"));
+    }
 
 }
