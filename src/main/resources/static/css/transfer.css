@@ -64,7 +64,7 @@ main {
     display: grid;
     grid-template-columns: 1fr 1fr 140px auto; /* 4 colonnes */
     gap: 20px;                                  /* espace entre colonnes */
-    align-items: center;                        /* verticalement aligné */
+    align-items: start;                        /* alignement vertical en haut pour tous les champs */
     margin-top: 8px;
     margin-bottom: 120px;                       /* espace sous le formulaire */
 }
@@ -186,4 +186,15 @@ main {
 
 .success-box, .error-box {
     margin-bottom: 20px;
+}
+
+.field-group {
+    display: flex;
+    flex-direction: column; /* empile le champ et le message */
+}
+
+.field-error {
+    color: #d8000c;
+    font-size: 13px;
+    margin-top: 4px;
 }
