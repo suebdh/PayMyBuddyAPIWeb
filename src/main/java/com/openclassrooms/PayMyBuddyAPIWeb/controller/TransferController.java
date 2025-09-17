@@ -56,7 +56,7 @@ public class TransferController {
         }
 
         try {
-            appUserService.processTransfer(transferForm); // TODO méthode à implémenter dans mon AppUserService
+            appUserService.processTransfer(transferForm);
             redirectAttributes.addFlashAttribute("successMessage", "Transfert d'argent effectué avec succès.");
             return "redirect:/transfer";
         } catch (IllegalArgumentException e) {
