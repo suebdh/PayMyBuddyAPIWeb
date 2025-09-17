@@ -51,7 +51,9 @@
 			<!-- Montant -->
 			<div class="field-group">
 				<label for="montant-input" class="visually-hidden">Montant (€)</label>
-				<input class="control" type="text" id="montant-input" th:field="*{montant}" placeholder="0€"/>
+				<input class="control" type="number" id="montant-input" th:field="*{montant}"
+				       th:value="${#numbers.formatDecimal(0,1,'DEFAULT',2,'DEFAULT')}" min="0" step="0.01"
+				       placeholder="0€"/>
 				<!-- Message d'erreur associé au champ montant -->
 				<span th:if="${#fields.hasErrors('montant')}" th:errors="*{montant}" class="field-error"></span>
 			</div>
