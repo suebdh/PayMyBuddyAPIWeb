@@ -162,3 +162,28 @@ main {
     color: #6b7280;
     font-size: 13px;
 }
+
+/* ============================================================
+   MESSAGES D’ERREUR / SUCCÈS
+   ============================================================ */
+.error-box {
+    background-color: #ffe0e0;
+    color: #d8000c;
+    padding: 10px;
+    border: 1px solid #d8000c;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+.success-box {
+    background-color: #e0ffe0;
+    color: #008000;
+    padding: 10px;
+    border: 1px solid #008000;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+.success-box, .error-box {
+    margin-bottom: 20px;
+}
