@@ -87,6 +87,26 @@
 			</tr>
 			</tbody>
 		</table>
+		
+		<!-- Pagination -->
+		<div class="pagination" role="navigation" aria-label="Pagination des transactions">
+            <span th:if="${currentPage > 0}">
+                <a th:href="@{/transfer(page=${currentPage-1},size=${size})}" class="pag-link" rel="prev">Précédent</a>
+	            <!-- Exemple : /transfer?page=1&size=10 -->
+            </span>
+			<span th:unless="${currentPage > 0}" class="pag-link disabled"
+			      aria-disabled="true">Précédent</span>
+			
+			<span class="page-info">Page [[${currentPage + 1}]] / [[${totalPages}]]</span>
+			<!-- Exemple rendu : Page 2 / 5 -->
+			
+			<span th:if="${currentPage + 1 < totalPages}">
+             <a th:href="@{/transfer(page=${currentPage+1},size=${size})}" class="pag-link" rel="next">Suivant</a>
+				<!-- Exemple : /transfer?page=3&size=10 -->
+            </span>
+			<span th:unless="${currentPage + 1 < totalPages}" class="pag-link disabled"
+			      aria-disabled="true">Suivant</span>
+		</div>
 	
 	</div>
 

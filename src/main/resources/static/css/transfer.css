@@ -73,16 +73,22 @@ main {
    SECTION 2 : HISTORIQUE DES TRANSACTIONS (.transactions-wrapper)
    ============================================================ */
 .transactions-wrapper {
+    display: flex; /* active le flex pour la mise en page verticale */
+    flex-direction: column; /* empile le tableau et la pagination verticalement */
     border: 1px solid var(--border); /* bordure visible sur les 4 côtés */
     border-radius: 10px;        /* arrondir les coins */
     overflow: hidden;           /* applique l'arrondi aussi au contenu */
     padding: 16px;
+
+    min-height: 500px; /* hauteur minimale pour stabiliser le rendu */
 }
 
 /* ============================================================
    TABLEAU (.transactions-table)
    ============================================================ */
 .transactions-table {
+    table-layout: fixed; /* Force le navigateur à fixer les largeurs des colonnes
+                            pour un affichage stable, indépendamment de la longueur du texte */
     width: 100%;
     border-collapse: collapse; /* supprime les espaces entre cellules */
     margin: 0;
@@ -154,15 +160,6 @@ main {
     background: #FDFDFF;
 }
 
-/* ------------------------------------------------------------
-   Note ou pied de tableau (Utile plus tard dans la pagination)
-   ------------------------------------------------------------ */
-.transactions-table + .table-note {
-    margin-top: 12px;
-    color: #6b7280;
-    font-size: 13px;
-}
-
 /* ============================================================
    MESSAGES D’ERREUR / SUCCÈS
    ============================================================ */
@@ -197,4 +194,57 @@ main {
     color: #d8000c;
     font-size: 13px;
     margin-top: 4px;
+}
+
+/* ============================================================
+   SECTION 2bis : PAGINATION
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   Conteneur de pagination : centré horizontalement avec espace
+   entre les éléments
+   ------------------------------------------------------------ */
+.pagination {
+    display: flex;
+    justify-content: center; /* centre horizontalement */
+    align-items: center;     /* centre verticalement */
+    gap: 12px;               /* espace entre éléments */
+    margin-top: 18px;
+    margin-top: auto; /* pousse la pagination en bas du wrapper */
+    font-size: 15px;
+}
+
+/* ------------------------------------------------------------
+   Style des liens cliquables
+   ------------------------------------------------------------ */
+.pagination .pag-link {
+    display: inline-block;   /* permet padding, largeur et border-radius */
+    padding: 8px 12px;      /* zone cliquable confortable */
+    border-radius: 8px;      /* coins arrondis */
+    text-decoration: none;   /* supprime le soulignement du lien */
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    color: inherit;          /* prend la couleur du parent */
+}
+
+/* ------------------------------------------------------------
+   Hover / focus : feedback visuel pour souris et clavier
+   ------------------------------------------------------------ */
+.pagination .pag-link:hover,
+.pagination .pag-link:focus {
+    transform: translateY(-1px);  /* effet "bouton qui se soulève" */
+    background: #f4f8ff;          /* léger changement de couleur */
+    outline: none;                 /* supprime le contour par défaut */
+}
+
+/* ------------------------------------------------------------
+   État désactivé : bouton atténué et non cliquable
+   ------------------------------------------------------------ */
+.pagination .pag-link.disabled {
+    opacity: 0.5;                  /* visuellement moins visible */
+    border-color: #eee;            /* bordure plus claire */
+    background: transparent;       /* fond transparent */
+    pointer-events: none;          /* bloque toute interaction */
+}
+
 }
