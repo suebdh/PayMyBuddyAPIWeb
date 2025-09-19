@@ -2,14 +2,18 @@ package com.openclassrooms.PayMyBuddyAPIWeb.service;
 
 import com.openclassrooms.PayMyBuddyAPIWeb.dto.AppUserDTO;
 import com.openclassrooms.PayMyBuddyAPIWeb.dto.RegisterDTO;
+import com.openclassrooms.PayMyBuddyAPIWeb.dto.TransferFormDTO;
 import com.openclassrooms.PayMyBuddyAPIWeb.dto.TransferHistoryDTO;
+import com.openclassrooms.PayMyBuddyAPIWeb.entity.AppTransaction;
 import com.openclassrooms.PayMyBuddyAPIWeb.entity.AppUser;
 import com.openclassrooms.PayMyBuddyAPIWeb.exception.AuthenticatedUserNotFoundException;
 import com.openclassrooms.PayMyBuddyAPIWeb.exception.EmailAlreadyUsedException;
 import com.openclassrooms.PayMyBuddyAPIWeb.exception.UserNotFoundException;
 import com.openclassrooms.PayMyBuddyAPIWeb.exception.UsernameAlreadyUsedException;
+import com.openclassrooms.PayMyBuddyAPIWeb.repository.AppTransactionRepository;
 import com.openclassrooms.PayMyBuddyAPIWeb.repository.AppUserRepository;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,6 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -24,6 +29,9 @@ public class AppUserService {
 
     @Autowired
     private AppUserRepository appUserRepository;
+
+    @Autowired
+    private AppTransactionRepository appTransactionRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -58,7 +66,7 @@ public class AppUserService {
 
     }
 
-    public AppUserDTO updateUser(int userId, AppUserDTO appUserDTO) {
+    public void updateUser(int userId, AppUserDTO appUserDTO) {
         // 1- Récupérer l'utilisateur existant
         AppUser existingUser = appUserRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("Utilisateur introuvable"));
@@ -81,8 +89,8 @@ public class AppUserService {
         existingUser.setBalance(appUserDTO.getBalance());
         // TODO A verifier plus tard si j'aurais d'autres champs ajoutés et donc à setter également
 
-        // 4- Sauvegarder et retourner le DTO
-        return convertToDTO(appUserRepository.save(existingUser));
+        // 4- Sauvegarder le DTO
+        convertToDTO(appUserRepository.save(existingUser));
     }
 
     public AppUserDTO getAuthenticatedUser() {
@@ -90,6 +98,15 @@ public class AppUserService {
         String email = auth.getName(); // récupère l'email de l'utilisateur connecté
         return appUserRepository.findByEmail(email)
                 .map(this::convertToDTO)
+                .orElseThrow(() -> new AuthenticatedUserNotFoundException(
+                        "Utilisateur connecté introuvable avec l'email : " + email
+                ));
+    }
+
+    public AppUser getAuthenticatedUserEntity() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+        return appUserRepository.findByEmail(email)
                 .orElseThrow(() -> new AuthenticatedUserNotFoundException(
                         "Utilisateur connecté introuvable avec l'email : " + email
                 ));
@@ -184,4 +201,52 @@ public class AppUserService {
 
         return all;
     }
+
+    @Transactional
+    public void processTransfer(@Valid TransferFormDTO dto) {
+        // Récupère l'utilisateur authentifié sous forme d'entité
+        AppUser sender = getAuthenticatedUserEntity();
+
+        // Cherche le destinataire
+        AppUser receiver = appUserRepository.findByUserName(dto.getRelation())
+                .orElseThrow(() -> new IllegalArgumentException("Relation introuvable"));
+
+        if (sender.getUserId() ==receiver.getUserId()) {
+            throw new IllegalArgumentException("Vous ne pouvez pas vous payer vous-même.");
+        }
+
+        // Vérifie que le receiver est bien un ami
+        boolean areFriends = sender.getFriends().contains(receiver);
+        if (!areFriends) {
+            throw new IllegalArgumentException("La relation sélectionnée n'est pas dans votre liste d'amis.");
+        }
+
+        BigDecimal amount = dto.getMontant();
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Montant invalide.");
+        }
+
+        // Vérifie le solde disponible
+        if (sender.getBalance().compareTo(amount) < 0) {
+            throw new IllegalArgumentException("Solde insuffisant.");
+        }
+
+        // Met à jour les soldes
+        sender.setBalance(sender.getBalance().subtract(amount));
+        receiver.setBalance(receiver.getBalance().add(amount));
+
+        // Sauvegarde les entités
+        appUserRepository.save(sender);
+        appUserRepository.save(receiver);
+
+        // Enregistre la transaction
+        AppTransaction tx = new AppTransaction();
+        tx.setSender(sender);
+        tx.setReceiver(receiver);
+        tx.setAmountTransaction(amount);
+        tx.setDescription(dto.getDescription());
+        tx.setTransactionCreatedAt(LocalDateTime.now());
+        appTransactionRepository.save(tx);
+    }
+
 }

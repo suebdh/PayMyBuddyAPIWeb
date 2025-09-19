@@ -64,7 +64,7 @@ main {
     display: grid;
     grid-template-columns: 1fr 1fr 140px auto; /* 4 colonnes */
     gap: 20px;                                  /* espace entre colonnes */
-    align-items: center;                        /* verticalement aligné */
+    align-items: start;                        /* alignement vertical en haut pour tous les champs */
     margin-top: 8px;
     margin-bottom: 120px;                       /* espace sous le formulaire */
 }
@@ -161,4 +161,40 @@ main {
     margin-top: 12px;
     color: #6b7280;
     font-size: 13px;
+}
+
+/* ============================================================
+   MESSAGES D’ERREUR / SUCCÈS
+   ============================================================ */
+.error-box {
+    background-color: #ffe0e0;
+    color: #d8000c;
+    padding: 10px;
+    border: 1px solid #d8000c;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+.success-box {
+    background-color: #e0ffe0;
+    color: #008000;
+    padding: 10px;
+    border: 1px solid #008000;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+.success-box, .error-box {
+    margin-bottom: 20px;
+}
+
+.field-group {
+    display: flex;
+    flex-direction: column; /* empile le champ et le message */
+}
+
+.field-error {
+    color: #d8000c;
+    font-size: 13px;
+    margin-top: 4px;
 }

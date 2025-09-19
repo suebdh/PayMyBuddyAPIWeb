@@ -12,31 +12,56 @@
 <div th:replace="~{fragments/header :: header('transfer')}"></div>
 
 <main>
+	
+	<div th:if="${successMessage}" class="success-box">
+		<p th:text="${successMessage}"></p>
+	</div>
+	<div th:if="${errorMessage}" class="error-box">
+		<p th:text="${errorMessage}"></p>
+	</div>
+	
 	<!-- Bloc n°1 : formulaire de transfert -->
-	<form th:object="${transferForm}" method="post" action="/transfer">
+	<form th:object="${transferForm}" method="post" th:action="@{/transfer}">
+		<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 		<div class="transfer-top">
 			<!-- Sélectionner une relation -->
-			<label for="relation-select" class="visually-hidden">Relation</label>
-			<select class="control" id="relation-select" th:field="*{relation}">
-				<option value="">Sélectionner une relation</option>
-				<option th:each="friend : ${friends}"
-				        th:value="${friend.userName}"
-				        th:text="${friend.userName}">
-				</option>
-			</select>
+			<div class="field-group">
+				<label for="relation-select" class="visually-hidden">Relation</label>
+				<select class="control" id="relation-select" th:field="*{relation}">
+					<option value="">Sélectionner une relation</option>
+					<option th:each="friend : ${friends}"
+					        th:value="${friend.userName}"
+					        th:text="${friend.userName}">
+					</option>
+				</select>
+				<!-- Message d'erreur associé au champ relation -->
+				<span th:if="${#fields.hasErrors('relation')}" th:errors="*{relation}" class="field-error"></span>
+			</div>
 			
 			<!-- Description -->
 			<label for="description-input" class="visually-hidden">Description</label>
-			<input class="control" type="text" id="description-input" th:field="*{description}" placeholder="Description"/>
+			<div class="field-group">
+				<input class="control" type="text" id="description-input" th:field="*{description}"
+				       placeholder="Description"/>
+				<!-- Message d'erreur associé au champ description -->
+				<span th:if="${#fields.hasErrors('description')}" th:errors="*{description}"
+				      class="field-error"></span>
+			</div>
 			
 			<!-- Montant -->
-			<label for="montant-input" class="visually-hidden">Montant (€)</label>
-			<input class="control" type="number" id="montant-input" th:field="*{montant}"
-			       th:value="${#numbers.formatDecimal(0,1,'DEFAULT',2,'DEFAULT')}" min="0" step="0.01"
-			       placeholder="0€"/>
+			<div class="field-group">
+				<label for="montant-input" class="visually-hidden">Montant (€)</label>
+				<input class="control" type="number" id="montant-input" th:field="*{montant}"
+				       th:value="${#numbers.formatDecimal(0,1,'DEFAULT',2,'DEFAULT')}" min="0" step="0.01"
+				       placeholder="0€"/>
+				<!-- Message d'erreur associé au champ montant -->
+				<span th:if="${#fields.hasErrors('montant')}" th:errors="*{montant}" class="field-error"></span>
+			</div>
 			
 			<!-- Bouton Payer -->
-			<button class="btn-pay">Payer</button>
+			<div class="field-group">
+				<button class="btn-pay" type="submit">Payer</button>
+			</div>
 		</div>
 	</form>
 	
