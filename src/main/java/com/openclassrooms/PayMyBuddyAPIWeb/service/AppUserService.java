@@ -15,6 +15,9 @@ import com.openclassrooms.PayMyBuddyAPIWeb.repository.AppUserRepository;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -87,7 +90,6 @@ public class AppUserService {
         existingUser.setEmail(appUserDTO.getEmail());
         existingUser.setPassword(passwordEncoder.encode(appUserDTO.getPassword()));
         existingUser.setBalance(appUserDTO.getBalance());
-        // TODO A verifier plus tard si j'aurais d'autres champs ajoutés et donc à setter également
 
         // 4- Sauvegarder le DTO
         convertToDTO(appUserRepository.save(existingUser));
@@ -96,6 +98,7 @@ public class AppUserService {
     public AppUserDTO getAuthenticatedUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String email = auth.getName(); // récupère l'email de l'utilisateur connecté
+        // getName() retourne l'email (config .withUsername(user.getEmail() de CustomUserDetailsService)
         return appUserRepository.findByEmail(email)
                 .map(this::convertToDTO)
                 .orElseThrow(() -> new AuthenticatedUserNotFoundException(
@@ -115,12 +118,7 @@ public class AppUserService {
     @Transactional
     public void addFriendByEmail(String friendEmail) {
         // Étape 1 : Récupérer l'utilisateur courant connecté
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String currentUserEmail = auth.getName();
-        // getName() retourne l'email (config .withUsername(user.getEmail() de CustomUserDetailsService)
-
-        AppUser currentUser = appUserRepository.findByEmail(currentUserEmail)
-                .orElseThrow(() -> new UserNotFoundException("Utilisateur courant introuvable !"));
+        AppUser currentUser = getAuthenticatedUserEntity();
 
         // Étape 2 : Vérifier si l'ami existe en BDD
         AppUser friend = appUserRepository.findByEmail(friendEmail)
@@ -158,22 +156,15 @@ public class AppUserService {
     }
 
     public List<AppUser> getFriendsForCurrentUser() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String email = auth.getName(); // email de l’utilisateur connecté
-
-        AppUser currentUser = appUserRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException("Utilisateur courant introuvable"));
+        AppUser currentUser = getAuthenticatedUserEntity();
 
         // Convertir le Set en List pour l'utiliser dans Thymeleaf
         return currentUser.getFriends().stream().toList();
     }
 
+    // VERSION SANS PAGINATION
     public List<TransferHistoryDTO> getTransactionHistoryForCurrentUser() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String email = auth.getName();
-
-        AppUser currentUser = appUserRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException("Utilisateur courant introuvable"));
+        AppUser currentUser = getAuthenticatedUserEntity();
 
         // Récupérer toutes les transactions envoyées (l'utilisateur est l'expéditeur)
         List<TransferHistoryDTO> sent = currentUser.getSentTransactions().stream()
@@ -198,8 +189,40 @@ public class AppUserService {
         all.addAll(sent);
         all.addAll(received);
 
-
         return all;
+    }
+
+    // NOUVELLE VERSION PAGINÉE
+    public List<TransferHistoryDTO> getTransactionHistoryForCurrentUser(int page, int size) {
+        AppUser currentUser = getAuthenticatedUserEntity();
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<AppTransaction> transactionPage =
+                appTransactionRepository.findBySenderOrReceiver(currentUser, currentUser, pageable);
+
+        return transactionPage.stream()
+                .map(tx -> {
+                    if (tx.getSender().equals(currentUser)) {
+                        return new TransferHistoryDTO(
+                                tx.getReceiver().getUserName(),
+                                tx.getDescription(),
+                                tx.getAmountTransaction().negate()
+                        );
+                    } else {
+                        return new TransferHistoryDTO(
+                                tx.getSender().getUserName(),
+                                tx.getDescription(),
+                                tx.getAmountTransaction()
+                        );
+                    }
+                })
+                .toList();
+    }
+
+    // Compteur total (utile pour calculer le nombre total de pages en fonction du nombre de transactions par page)
+    public int countTransactionsForCurrentUser() {
+        AppUser currentUser = getAuthenticatedUserEntity();
+        return appTransactionRepository.countBySenderOrReceiver(currentUser, currentUser);
     }
 
     @Transactional
@@ -248,5 +271,4 @@ public class AppUserService {
         tx.setTransactionCreatedAt(LocalDateTime.now());
         appTransactionRepository.save(tx);
     }
-
 }
