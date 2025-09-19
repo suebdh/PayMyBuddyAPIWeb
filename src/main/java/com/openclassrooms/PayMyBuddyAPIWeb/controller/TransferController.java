@@ -11,6 +11,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
@@ -20,12 +21,14 @@ public class TransferController {
 
     private final AppUserService appUserService;
 
-    public TransferController(AppUserService appUserService){
-        this.appUserService =appUserService;
+    public TransferController(AppUserService appUserService) {
+        this.appUserService = appUserService;
     }
 
     @GetMapping("/transfer")
-    public String showTransferPage(Model model) {
+    public String showTransferPage(Model model,
+                                   @RequestParam(defaultValue = "0") int page,
+                                   @RequestParam(defaultValue = "5") int size) { // size = nombre de transactions par page
 
         // 1. Ajoute le DTO vide pour le binding du formulaire
         model.addAttribute("transferForm", new TransferFormDTO());
@@ -35,8 +38,16 @@ public class TransferController {
         model.addAttribute("friends", friends);
 
         // 3. Récupère l'historique des transactions
-        List<TransferHistoryDTO> transactions = appUserService.getTransactionHistoryForCurrentUser();
+        List<TransferHistoryDTO> transactions = appUserService.getTransactionHistoryForCurrentUser(page, size);
         model.addAttribute("transactions", transactions);
+
+        // 4. Récupération paginée des transactions
+        int totalTransactions = appUserService.countTransactionsForCurrentUser();
+        int totalPages = (int) Math.ceil((double) totalTransactions / size);
+
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("size", size);
 
         return "transfer"; // correspond à transfer.html dans /templates
     }
@@ -48,10 +59,23 @@ public class TransferController {
             Model model,
             RedirectAttributes redirectAttributes) {
 
+        // Fonction utilitaire pour ajouter les attributs de pagination et amis
+        Runnable populateModel = () -> {
+            List<AppUser> friends = appUserService.getFriendsForCurrentUser();
+            List<TransferHistoryDTO> transactions = appUserService.getTransactionHistoryForCurrentUser(0, 5);
+            int totalTransactions = appUserService.countTransactionsForCurrentUser();
+            int totalPages = (int) Math.ceil((double) totalTransactions / 5);
+
+            model.addAttribute("friends", friends);
+            model.addAttribute("transactions", transactions);
+            model.addAttribute("currentPage", 0); // page par défaut
+            model.addAttribute("totalPages", totalPages);
+            model.addAttribute("size", 5);
+        };
+
         // si erreurs de validation côté champ
         if (bindingResult.hasErrors()) {
-            model.addAttribute("friends", appUserService.getFriendsForCurrentUser());
-            model.addAttribute("transactions", appUserService.getTransactionHistoryForCurrentUser());
+            populateModel.run();
             return "transfer";
         }
 
@@ -61,14 +85,12 @@ public class TransferController {
             return "redirect:/transfer";
         } catch (IllegalArgumentException e) {
             // erreur métier (ex : solde insuffisant, relation invalide...)
+            populateModel.run();
             model.addAttribute("errorMessage", e.getMessage());
-            model.addAttribute("friends", appUserService.getFriendsForCurrentUser());
-            model.addAttribute("transactions", appUserService.getTransactionHistoryForCurrentUser());
             return "transfer";
         } catch (Exception e) {
+            populateModel.run();
             model.addAttribute("errorMessage", "Erreur serveur. Réessayez plus tard.");// erreur serveur générale
-            model.addAttribute("friends", appUserService.getFriendsForCurrentUser());
-            model.addAttribute("transactions", appUserService.getTransactionHistoryForCurrentUser());
             return "transfer";
         }
     }
