@@ -5,10 +5,17 @@ import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * DTO pour la mise à jour du profil utilisateur.
+ * <p>
+ * Contient le nom d'utilisateur, l'email et un mot de passe optionnel.
+ * La validation des champs est appliquée via les annotations Jakarta Validation.
+ */
 @Getter
 @Setter
 public class ProfilDTO {
 
+    /** Nom d'utilisateur (obligatoire, max 50 caractères) */
     @NotBlank(message = "Le nom d'utilisateur est obligatoire")
     @Size(max = 50, message = "Le nom d'utilisateur ne doit pas dépasser 50 caractères")
     private String username;

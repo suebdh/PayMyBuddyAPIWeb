@@ -6,11 +6,22 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 
+/**
+ * DTO représentant l'historique d'un transfert d'argent.
+ * <p>
+ * Contient le bénéficiaire, la description et le montant du transfert.
+ */
 @Getter
 @Setter
 @AllArgsConstructor
 public class TransferHistoryDTO {
-    private String relation;      // nom de l'ami (receiver)
-    private String description;   // description du transfert
+
+    /** Nom de l'ami bénéficiaire (receiver)*/
+    private String relation;
+
+    /** Description du transfert */
+    private String description;
+
+    /** Montant du transfert */
     private BigDecimal montant;   // montant du transfert
 }

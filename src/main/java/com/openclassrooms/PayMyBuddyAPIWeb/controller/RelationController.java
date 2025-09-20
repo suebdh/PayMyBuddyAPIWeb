@@ -13,6 +13,20 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+/**
+ * Contrôleur Spring MVC pour la gestion des relations utilisateur (ajout d'amis).
+ * <p>
+ * Cette classe permet de :
+ * <ul>
+ *   <li> Afficher la page de création d'une nouvelle relation.</li>
+ *   <li> Traiter l'ajout d'une relation via l'email de l'utilisateur cible.</li>
+ *   <li> Gérer la validation du formulaire et les exceptions métier
+ *       (utilisateur non trouvé, erreurs logiques, erreurs inattendues).</li>
+ * </ul>
+ *
+ * La vue associée est rendue via Thymeleaf (relation.html).
+ * Utilise le pattern PRG (Post-Redirect-Get) pour éviter la soumission 'multiple' du formulaire.
+ */
 @Slf4j
 @Controller
 public class RelationController {
@@ -23,6 +37,15 @@ public class RelationController {
         this.appUserService = appUserService;
     }
 
+    /**
+     * Affiche la page d'ajout d'une nouvelle relation.
+     * <p>
+     * Cette méthode initialise un RelationDTO si le modèle ne contient pas déjà un DTO existant.
+     * Le DTO est utilisé par Thymeleaf pour remplir le formulaire.
+     *
+     * @param model le modèle Spring MVC permettant de passer des attributs à la vue
+     * @return le nom de la vue Thymeleaf {relation.html}
+     */
     @GetMapping("/relation")
     public String showRelationPage(Model model) {
         log.info("********** Obtenir la page de : AJOUT NOUVELLE RELATION **********");
@@ -34,6 +57,24 @@ public class RelationController {
         return "relation";
     }
 
+    /**
+     * Traite la soumission du formulaire d'ajout d'une relation.
+     * <p>
+     * Cette méthode :
+     * <ul>
+     *   <li>Valide les données du formulaire (RelationDTO).</li>
+     *   <li>Appelle le service {AppUserService#addFriendByEmail(String)} pour ajouter l'ami.</li>
+     *   <li>Gère les erreurs de validation et les exceptions métier
+     *       (UserNotFoundException;IllegalArgumentException;IllegalStateException).</li>
+     *   <li>Utilise RedirectAttributes pour transmettre les messages de succès ou d'erreur après redirection.</li>
+     *   <li>Applique le pattern PRG (Post-Redirect-Get) pour éviter les doublons de soumission.</li>
+     * </ul>
+     *
+     * @param relationDto        le DTO contenant l'email de l'utilisateur à ajouter en ami
+     * @param bindingResult      les résultats de la validation du formulaire
+     * @param redirectAttributes permet de passer des attributs (messages ou DTO) après redirection
+     * @return la redirection vers {/relation} avec un paramètre de succès ou les erreurs associées
+     */
     @PostMapping("/relation")
     public String addRelation(
             @Valid @ModelAttribute("relationDto") RelationDTO relationDto,

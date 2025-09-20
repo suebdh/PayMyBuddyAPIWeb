@@ -14,6 +14,23 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
+/**
+ * Contrôleur Spring MVC responsable de la gestion des inscriptions utilisateurs.
+ * <p>
+ * Ce contrôleur permet d'afficher le formulaire d'inscription  GET /register
+ * et de traiter la soumission de ce formulaire POST /register
+ * </p>
+ *
+ * <ul>
+ *   <li>Affiche la page d'inscription avec un {RegisterDTO} vide.</li>
+ *   <li>Valide les données saisies par l'utilisateur.</li>
+ *   <li>Gère les erreurs de validation standards et les cas particuliers
+ *       où l'adresse email ou le nom d'utilisateur sont déjà utilisés.</li>
+ *   <li>Redirige vers la page de connexion après une inscription réussie.</li>
+ * </ul>
+ *
+ * @author
+ */
 @Slf4j
 @Controller
 public class RegisterController {
@@ -21,7 +38,7 @@ public class RegisterController {
     @Autowired
     private AppUserService appUserService;
 
-    // Méthode GET /register : afficher le formulaire
+    // Méthode GET /register : afficher le formulaire d'inscription
     @GetMapping("/register")
     public String showRegisterForm(Model model) {
         log.info("********** Obtenir la page de : INSCRIPTION **********");
@@ -30,7 +47,7 @@ public class RegisterController {
     }
 
 
-    // Méthode POST /register : traitement du formulaire
+    // Méthode POST /register : traitement de la soumission du formulaire d'inscription
     @PostMapping("/register")
     public String registerUser(@Valid RegisterDTO registerDTO,
                                BindingResult bindingResult,

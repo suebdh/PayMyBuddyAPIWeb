@@ -8,6 +8,7 @@ import com.openclassrooms.PayMyBuddyAPIWeb.service.AppUserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,14 +20,38 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
+/**
+ * Contrôleur Spring MVC pour la gestion du profil utilisateur.
+ * <p>
+ * Cette classe permet de :
+ * <ul>
+ *   <li> Charger et d'afficher la page de profil de l'utilisateur connecté.</li>
+ *   <li> Traiter la mise à jour des informations du profil (nom d'utilisateur, mot de passe).</li>
+ *   <li> Gérer les cas d'erreurs de validation et les exceptions métier (ex : nom d'utilisateur déjà utilisé).</li>
+ * </ul>
+ *
+ * La vue associée est rendue via Thymeleaf (profil.html).
+ */
+@Slf4j
 @Controller
 public class ProfilController {
 
     @Autowired
     private AppUserService appUserService;
 
+    /**
+     * Affiche la page du profil utilisateur.
+     * <p>
+     * Cette méthode récupère l'utilisateur actuellement authentifié via AppUserService#getAuthenticatedUser()
+     * et initialise un ProfilDTO avec les données existantes (nom d'utilisateur, email).
+     *
+     * @param model le modèle Spring MVC permettant de passer des attributs à la vue
+     * @return le nom de la vue Thymeleaf {profil.html}
+     */
     @GetMapping("/profil")
     public String showProfilPage(Model model) {
+
+        log.info("********** Obtenir la page de : MODIFICATION PROFIL **********");
         // Récupère l’utilisateur connecté via Spring Security
         AppUserDTO userDTO = appUserService.getAuthenticatedUser(); // ne peut jamais être null
 
@@ -39,6 +64,25 @@ public class ProfilController {
         return "profil"; // correspond à profil.html dans /templates
     }
 
+    /**
+     * Met à jour les informations du profil utilisateur.
+     * <p>
+     * Cette méthode :
+     * <ul>
+     *   <li>Valide les données du formulaire ProfilDTO.</li>
+     *   <li>Met à jour l'utilisateur via AppUserService#updateUser(Long, AppUserDTO).</li>
+     *   <li>Gère les erreurs de validation (via BindingResult).</li>
+     *   <li>Déconnecte l'utilisateur si le mot de passe est modifié, pour forcer une reconnexion.</li>
+     *   <li>Retourne la vue du profil avec un message de succès ou d'erreur.</li>
+     * </ul>
+     *
+     * @param profilDTO     les données du formulaire de profil (nom d'utilisateur, email, mot de passe)
+     * @param bindingResult les résultats de la validation du formulaire
+     * @param request       la requête HTTP (utilisée pour la déconnexion en cas de changement de mot de passe)
+     * @param response      la réponse HTTP
+     * @param model         le modèle Spring MVC pour transmettre des messages à la vue
+     * @return le nom de la vue {profil} ou une redirection vers {/login} si le mot de passe a été modifié
+     */
     @PostMapping("/profil")
     public String updateProfil(@Valid @ModelAttribute("profil") ProfilDTO profilDTO,
                                BindingResult bindingResult,
