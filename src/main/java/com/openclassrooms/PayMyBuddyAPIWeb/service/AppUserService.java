@@ -27,6 +27,23 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Service principal pour la gestion des utilisateurs et des transactions
+ * de l'application PayMyBuddy.
+ * <p>
+ * Ce service fournit des méthodes pour :
+ * <ul>
+ *     <li>Créer et mettre à jour un utilisateur</li>
+ *     <li>Récupérer l'utilisateur actuellement authentifié</li>
+ *     <li>Ajouter un ami à un utilisateur</li>
+ *     <li>Récupérer la liste des amis</li>
+ *     <li>Récupérer l'historique des transactions (avec ou sans pagination)</li>
+ *     <li>Effectuer un transfert d'argent entre utilisateurs</li>
+ * </ul>
+ * <p>
+ * Le service gère également la validation des emails et noms d'utilisateur uniques
+ * ainsi que la sécurité des opérations (authentification, autorisation, validation de solde).
+ */
 @Service
 public class AppUserService {
 
@@ -39,20 +56,38 @@ public class AppUserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    // Vérifier si l'email existe déjà
+    /**
+     * Vérifie que l'email fourni n'existe pas déjà en base.
+     *
+     * @param email l'email à valider
+     * @throws EmailAlreadyUsedException si l'email est déjà utilisé
+     */
     private void validateEmailUnique(String email) {
         if (appUserRepository.findByEmail(email).isPresent()) {
             throw new EmailAlreadyUsedException("Email déjà utilisé !");
         }
     }
 
-    //Vérifier si username existe déjà
+    /**
+     * Vérifie que le nom d'utilisateur fourni n'existe pas déjà en base.
+     *
+     * @param userName le nom d'utilisateur à valider
+     * @throws UsernameAlreadyUsedException si le nom d'utilisateur est déjà utilisé
+     */
     private void validateUserNameUnique(String userName) {
         if (appUserRepository.findByUserName(userName).isPresent()) {
             throw new UsernameAlreadyUsedException("Nom d'utilisateur déjà utilisé !");
         }
     }
 
+    /**
+     * Crée un nouvel utilisateur à partir d'un {RegisterDTO}.
+     * Le mot de passe est haché et le solde initialisé à zéro.
+     *
+     * @param registerDTO DTO contenant les informations de l'utilisateur
+     * @throws EmailAlreadyUsedException si l'email existe déjà
+     * @throws UsernameAlreadyUsedException si le nom d'utilisateur existe déjà
+     */
     public void createUser(RegisterDTO registerDTO) {
 
         validateEmailUnique(registerDTO.getEmail());
@@ -69,6 +104,16 @@ public class AppUserService {
 
     }
 
+    /**
+     * Met à jour un utilisateur existant.
+     * Vérifie que l'email et le nom d'utilisateur restent uniques si modifiés.
+     *
+     * @param userId l'identifiant de l'utilisateur à mettre à jour
+     * @param appUserDTO DTO contenant les nouvelles valeurs
+     * @throws UserNotFoundException si l'utilisateur n'existe pas
+     * @throws EmailAlreadyUsedException si le nouvel email est déjà utilisé
+     * @throws UsernameAlreadyUsedException si le nouveau nom d'utilisateur est déjà utilisé
+     */
     public void updateUser(int userId, AppUserDTO appUserDTO) {
         // 1- Récupérer l'utilisateur existant
         AppUser existingUser = appUserRepository.findById(userId)
@@ -95,6 +140,12 @@ public class AppUserService {
         convertToDTO(appUserRepository.save(existingUser));
     }
 
+    /**
+     * Récupère l'utilisateur actuellement authentifié sous forme de DTO.
+     *
+     * @return AppUserDTO de l'utilisateur connecté
+     * @throws AuthenticatedUserNotFoundException si l'utilisateur connecté n'existe pas
+     */
     public AppUserDTO getAuthenticatedUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String email = auth.getName(); // récupère l'email de l'utilisateur connecté
@@ -106,6 +157,12 @@ public class AppUserService {
                 ));
     }
 
+    /**
+     * Récupère l'utilisateur actuellement authentifié sous forme d'entité.
+     *
+     * @return {AppUser} connecté
+     * @throws AuthenticatedUserNotFoundException si l'utilisateur connecté n'existe pas
+     */
     public AppUser getAuthenticatedUserEntity() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String email = auth.getName();
@@ -115,6 +172,14 @@ public class AppUserService {
                 ));
     }
 
+    /**
+     * Ajoute un utilisateur comme ami en utilisant son email.
+     *
+     * @param friendEmail email de l'ami à ajouter
+     * @throws UserNotFoundException si l'utilisateur à ajouter n'existe pas
+     * @throws IllegalArgumentException si l'utilisateur tente de s'ajouter lui-même
+     * @throws IllegalStateException si la relation existe déjà
+     */
     @Transactional
     public void addFriendByEmail(String friendEmail) {
         // Étape 1 : Récupérer l'utilisateur courant connecté
@@ -144,6 +209,12 @@ public class AppUserService {
         appUserRepository.save(currentUser);
     }
 
+    /**
+     * Convertit une entité {AppUser} en {AppUserDTO}.
+     *
+     * @param appUser l'utilisateur à convertir
+     * @return DTO correspondant
+     */
     public AppUserDTO convertToDTO(AppUser appUser) {
         return new AppUserDTO(
                 appUser.getUserId(),
@@ -155,6 +226,11 @@ public class AppUserService {
         );
     }
 
+    /**
+     * Récupère la liste des amis de l'utilisateur connecté.
+     *
+     * @return liste des {AppUser} amis
+     */
     public List<AppUser> getFriendsForCurrentUser() {
         AppUser currentUser = getAuthenticatedUserEntity();
 
@@ -163,6 +239,11 @@ public class AppUserService {
     }
 
     // VERSION SANS PAGINATION
+    /**
+     * Récupère l'historique complet des transactions de l'utilisateur (sans pagination).
+     *
+     * @return liste de {TransferHistoryDTO} représentant les transactions
+     */
     public List<TransferHistoryDTO> getTransactionHistoryForCurrentUser() {
         AppUser currentUser = getAuthenticatedUserEntity();
 
@@ -193,6 +274,13 @@ public class AppUserService {
     }
 
     // NOUVELLE VERSION PAGINÉE
+    /**
+     * Récupère l'historique paginé des transactions de l'utilisateur.
+     *
+     * @param page numéro de la page (0-indexée)
+     * @param size nombre de transactions par page
+     * @return liste de {TransferHistoryDTO} correspondant à la page
+     */
     public List<TransferHistoryDTO> getTransactionHistoryForCurrentUser(int page, int size) {
         AppUser currentUser = getAuthenticatedUserEntity();
 
@@ -219,12 +307,50 @@ public class AppUserService {
                 .toList();
     }
 
-    // Compteur total (utile pour calculer le nombre total de pages en fonction du nombre de transactions par page)
+    // Utile pour calculer le nombre total de pages en fonction du nombre de transactions par page)
+    /**
+     * Compte le nombre total de transactions de l'utilisateur connecté.
+     *
+     * @return nombre total de transactions
+     */
     public int countTransactionsForCurrentUser() {
         AppUser currentUser = getAuthenticatedUserEntity();
         return appTransactionRepository.countBySenderOrReceiver(currentUser, currentUser);
     }
 
+    /**
+     * Traite un transfert d'argent entre l'utilisateur actuellement connecté (expéditeur)
+     * et un ami sélectionné (destinataire).
+     * <p>
+     * La méthode effectue les étapes suivantes :
+     * <ol>
+     *     <li>Récupère l'utilisateur authentifié (expéditeur) via le contexte de sécurité.</li>
+     *     <li>Récupère le destinataire en utilisant le nom d'utilisateur fourni dans {TransferFormDTO}.</li>
+     *     <li>Vérifie que l'expéditeur ne tente pas de se transférer de l'argent à lui-même.</li>
+     *     <li>Vérifie que le destinataire est bien un ami de l'expéditeur.</li>
+     *     <li>Vérifie que le montant du transfert est valide (non nul et positif).</li>
+     *     <li>Vérifie que le solde de l'expéditeur est suffisant pour effectuer le transfert.</li>
+     *     <li>Met à jour les soldes de l'expéditeur et du destinataire.</li>
+     *     <li>Persiste les changements dans la base de données pour les deux utilisateurs.</li>
+     *     <li>Crée et enregistre un objet {AppTransaction} représentant le transfert.</li>
+     * </ol>
+     *
+     * @param dto objet {TransferFormDTO} contenant :
+     *            <ul>
+     *                <li>relation : nom d'utilisateur du destinataire</li>
+     *                <li>description : description du transfert</li>
+     *                <li>montant : montant du transfert</li>
+     *            </ul>
+     *
+     * @throws IllegalArgumentException si :
+     *         <ul>
+     *             <li>le destinataire n'existe pas</li>
+     *             <li>l'expéditeur tente de se transférer de l'argent à lui-même</li>
+     *             <li>le destinataire n'est pas un ami</li>
+     *             <li>le montant est nul ou négatif</li>
+     *             <li>le solde de l'expéditeur n'est pas suffisant</li>
+     *         </ul>
+     */
     @Transactional
     public void processTransfer(@Valid TransferFormDTO dto) {
         // Récupère l'utilisateur authentifié sous forme d'entité
