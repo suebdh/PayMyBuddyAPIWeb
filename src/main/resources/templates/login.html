@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>PayMyBuddy - Connexion</title>
+    <link rel="stylesheet" th:href="@{/css/login.css}">
+</head>
+<body>
+<div class="login-card">
+    <h2>Pay My Buddy</h2>
+
+    <!-- Message de succès après inscription -->
+    <div th:if="${param.registered}">
+        <p class="success-message">
+            Inscription réussie ! Vous pouvez vous connecter.
+        </p>
+    </div>
+
+    <!-- Message de succès après déconnexion -->
+    <div th:if="${success}">
+        <p class="success-message" th:text="${success}"></p>
+    </div>
+
+    <!-- Message d'erreur -->
+    <div th:if="${error}" class="error-message" th:text="${error}"></div>
+
+    <form method="post" th:action="@{/login}">
+        <!-- Champ email MAIS AVEC NAME=username -->
+        <label for ="username" class="visually-hidden">Adresse email</label>
+            <input type="email" id ="username" name="username" placeholder="Mail" required>
+
+        <!-- Champ mot de passe -->
+        <label for="password" class="visually-hidden">Mot de passe</label>
+            <input type="password" id="password" name="password" placeholder="Mot de passe" required>
+
+        <button type="submit">Se connecter</button>
+    </form>
+
+    <p>
+        Pas encore inscrit ? <a th:href="@{/register}">Créer un compte</a>
+    </p>
+</div>
+</body>
+</html>

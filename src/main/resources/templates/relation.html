@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>PayMyBuddy - Relation</title>
+    <link rel="stylesheet" th:href="@{/css/styleHeader.css}">
+    <link rel="stylesheet" th:href="@{/css/relation.css}">
+</head>
+<body>
+
+<!-- inclusion du header : on passe 'relation' en param -->
+<div th:replace="~{fragments/header :: header('relation')}"></div>
+
+<main>
+
+    <!-- Messages -->
+    <!-- Cas 1 : message succès avec paramètre URL -->
+    <div th:if="${param.success}" class="success-message">
+        Relation ajoutée avec succès !
+    </div>
+    <!-- Cas 2 : message erreur générique avec paramètre URL -->
+    <div th:if="${param.error}" class="error-message">
+        Une erreur est survenue lors de l’ajout de la relation !
+    </div>
+
+    <!-- Formulaire -->
+    <form method="post" th:action="@{/relation}" th:object="${relationDto}">
+        <div class="form-row">
+            <div class="form-group">
+                <label for="email">Chercher une relation</label>
+                <input type="email" id="email" th:field="*{email}"
+                       th:classappend="${#fields.hasErrors('email')} ? 'is-invalid' : ''"
+                       aria-describedby="emailErrorMessage" placeholder="Saisir une adresse mail">
+                <div id="emailErrorMessage"
+                     th:classappend="${#fields.hasErrors('email')} ? 'invalid-feedback'"
+                     th:errors="*{email}"></div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit">Ajouter</button>
+            </div>
+        </div>
+    </form>
+
+</main>
+
+</body>
+</html>

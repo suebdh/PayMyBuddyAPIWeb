@@ -1,0 +1,250 @@
+/* ============================================================
+   VARIABLES GLOBALES
+   ============================================================ */
+:root {
+    --border: #E6E8EB;   /* gris très clair pour les bordures */
+    --card-bg: #FFF;     /* fond blanc des cartes (table, champs) */
+}
+
+/* ============================================================
+   STYLES GÉNÉRAUX DU BODY
+   ============================================================ */
+body {
+    font-family: Inter, Arial, sans-serif;
+    background-color: --card-bg;    /* fond blanc */
+    line-height: 1.5;
+    margin: 0;
+    padding: 0;
+}
+
+main {
+    max-width: 1440px;
+    max-height: 426px;
+    margin: 40px auto; /* centre la zone + espace en haut/bas */
+    padding: 0 24px;   /* marge intérieure gauche/droite */
+}
+
+/* ============================================================
+   UTILITAIRES / CLASSES RÉUTILISABLES
+   ============================================================ */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+.control {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 15px;
+}
+
+.btn-pay {
+    display: inline-block;
+    background: #207FEE; /* couleur principale = bleu bouton */
+    color: white;
+    border: none;
+    padding: 12px 22px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* ============================================================
+   SECTION 1 : FORMULAIRE DE TRANSFERT (.transfer-top)
+   ============================================================ */
+.transfer-top {
+    display: grid;
+    grid-template-columns: 1fr 1fr 140px auto; /* 4 colonnes */
+    gap: 20px;                                  /* espace entre colonnes */
+    align-items: start;                        /* alignement vertical en haut pour tous les champs */
+    margin-top: 8px;
+    margin-bottom: 120px;                       /* espace sous le formulaire */
+}
+
+/* ============================================================
+   SECTION 2 : HISTORIQUE DES TRANSACTIONS (.transactions-wrapper)
+   ============================================================ */
+.transactions-wrapper {
+    display: flex; /* active le flex pour la mise en page verticale */
+    flex-direction: column; /* empile le tableau et la pagination verticalement */
+    border: 1px solid var(--border); /* bordure visible sur les 4 côtés */
+    border-radius: 10px;        /* arrondir les coins */
+    overflow: hidden;           /* applique l'arrondi aussi au contenu */
+    padding: 16px;
+
+    min-height: 500px; /* hauteur minimale pour stabiliser le rendu */
+}
+
+/* ============================================================
+   TABLEAU (.transactions-table)
+   ============================================================ */
+.transactions-table {
+    table-layout: fixed; /* Force le navigateur à fixer les largeurs des colonnes
+                            pour un affichage stable, indépendamment de la longueur du texte */
+    width: 100%;
+    border-collapse: collapse; /* supprime les espaces entre cellules */
+    margin: 0;
+    background: var(--card-bg);
+    border: none;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* ------------------------------------------------------------
+   Caption / Titre du tableau
+   ------------------------------------------------------------ */
+.transactions-table caption {
+    text-align: left;
+    font-weight: 700;
+    font-size: 24px;
+    padding-bottom: 20px; /* espace sous le titre */
+}
+
+/* ------------------------------------------------------------
+   En-tête du tableau (thead)
+   ------------------------------------------------------------ */
+.transactions-table thead tr {
+    border-bottom: 1px solid var(--border);
+    background: #fff; /* fond blanc */
+}
+
+.transactions-table th {
+    font-weight: 600;
+    font-size: 24px;
+    text-align: left;
+    padding: 16px 24px;
+}
+
+/* ------------------------------------------------------------
+   Cellules du corps (tbody)
+   ------------------------------------------------------------ */
+.transactions-table td,
+.transactions-table th[scope="row"] {
+    padding: 16px 24px;
+    vertical-align: middle;
+    font-size: 22px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.transactions-table td:first-child,
+.transactions-table th:first-child {
+    padding-left: 32px;
+}
+
+.transactions-table td:last-child,
+.transactions-table th:last-child {
+    padding-right: 32px;
+    text-align: right; /* aligner les montants à droite */
+}
+
+/* ------------------------------------------------------------
+   Dernière ligne : suppression bordure
+   ------------------------------------------------------------ */
+.transactions-table tbody tr:last-child td,
+.transactions-table tbody tr:last-child th {
+    border-bottom: none;
+}
+
+/* ------------------------------------------------------------
+   Effet survol des lignes
+   ------------------------------------------------------------ */
+.transactions-table tbody tr:hover {
+    background: #FDFDFF;
+}
+
+/* ============================================================
+   MESSAGES D’ERREUR / SUCCÈS
+   ============================================================ */
+.error-box {
+    background-color: #ffe0e0;
+    color: #d8000c;
+    padding: 10px;
+    border: 1px solid #d8000c;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+.success-box {
+    background-color: #e0ffe0;
+    color: #008000;
+    padding: 10px;
+    border: 1px solid #008000;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+.success-box, .error-box {
+    margin-bottom: 20px;
+}
+
+.field-group {
+    display: flex;
+    flex-direction: column; /* empile le champ et le message */
+}
+
+.field-error {
+    color: #d8000c;
+    font-size: 13px;
+    margin-top: 4px;
+}
+
+/* ============================================================
+   SECTION 2bis : PAGINATION
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   Conteneur de pagination : centré horizontalement avec espace
+   entre les éléments
+   ------------------------------------------------------------ */
+.pagination {
+    display: flex;
+    justify-content: center; /* centre horizontalement */
+    align-items: center;     /* centre verticalement */
+    gap: 12px;               /* espace entre éléments */
+    margin-top: 18px;
+    margin-top: auto; /* pousse la pagination en bas du wrapper */
+    font-size: 15px;
+}
+
+/* ------------------------------------------------------------
+   Style des liens cliquables
+   ------------------------------------------------------------ */
+.pagination .pag-link {
+    display: inline-block;   /* permet padding, largeur et border-radius */
+    padding: 8px 12px;      /* zone cliquable confortable */
+    border-radius: 8px;      /* coins arrondis */
+    text-decoration: none;   /* supprime le soulignement du lien */
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    color: inherit;          /* prend la couleur du parent */
+}
+
+/* ------------------------------------------------------------
+   Hover / focus : feedback visuel pour souris et clavier
+   ------------------------------------------------------------ */
+.pagination .pag-link:hover,
+.pagination .pag-link:focus {
+    transform: translateY(-1px);  /* effet "bouton qui se soulève" */
+    background: #f4f8ff;          /* léger changement de couleur */
+    outline: none;                 /* supprime le contour par défaut */
+}
+
+/* ------------------------------------------------------------
+   État désactivé : bouton atténué et non cliquable
+   ------------------------------------------------------------ */
+.pagination .pag-link.disabled {
+    opacity: 0.5;                  /* visuellement moins visible */
+    border-color: #eee;            /* bordure plus claire */
+    background: transparent;       /* fond transparent */
+    pointer-events: none;          /* bloque toute interaction */
+}
+
+}
