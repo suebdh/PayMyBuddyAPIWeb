@@ -2,6 +2,8 @@ package com.openclassrooms.PayMyBuddyAPIWeb.repository;
 
 import com.openclassrooms.PayMyBuddyAPIWeb.entity.AppUser;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -38,4 +40,17 @@ public interface AppUserRepository extends JpaRepository<AppUser, Integer> {
      * @return un Optional contenant l'utilisateur si trouvé, sinon vide
      */
     Optional<AppUser> findByUserName(String userName);
+
+    /**
+     * Recherche un utilisateur par son adresse email et charge simultanément sa liste d'amis.
+     * <p>
+     * Utilise un LEFT JOIN FETCH sur la relation friends afin d'initialiser la collection dès la récupération
+     * de l'utilisateur, évitant ainsi les problèmes de LazyInitializationException lorsque la session Hibernate est fermée.
+     * </p>
+     *
+     * @param email l'email de l'utilisateur à rechercher
+     * @return un Optional contenant l'utilisateur avec sa collection d'amis préchargée si trouvé, sinon vide
+     */
+    @Query("SELECT u FROM AppUser u LEFT JOIN FETCH u.friends WHERE u.email = :email")
+    Optional<AppUser> findByEmailWithFriends(@Param("email") String email);
 }

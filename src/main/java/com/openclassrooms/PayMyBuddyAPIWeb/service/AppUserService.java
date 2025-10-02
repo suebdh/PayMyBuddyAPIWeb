@@ -180,10 +180,12 @@ public class AppUserService {
      * @throws IllegalArgumentException si l'utilisateur tente de s'ajouter lui-même
      * @throws IllegalStateException si la relation existe déjà
      */
-    @Transactional
+
     public void addFriendByEmail(String friendEmail) {
-        // Étape 1 : Récupérer l'utilisateur courant connecté
-        AppUser currentUser = getAuthenticatedUserEntity();
+        // Étape 1 : Récupérer l'utilisateur courant connecté avec ses amis
+        AppUser currentUser = appUserRepository.findByEmailWithFriends(getAuthenticatedUserEntity().getEmail())
+                .orElseThrow(() -> new AuthenticatedUserNotFoundException("Utilisateur connecté introuvable"));
+
 
         // Étape 2 : Vérifier si l'ami existe en BDD
         AppUser friend = appUserRepository.findByEmail(friendEmail)
