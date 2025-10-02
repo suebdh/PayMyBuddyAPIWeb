@@ -17,9 +17,9 @@ import org.springframework.stereotype.Repository;
  *
  * <p>Méthodes principales :</p>
  * <ul>
- *     <li> #findBySenderOrReceiver(AppUser, AppUser, Pageable) : récupère toutes les transactions
- *         envoyées ou reçues par un utilisateur, avec pagination.</li>
- *     <li> #countBySenderOrReceiver(AppUser, AppUser) : compte le nombre total de transactions
+ *     <li> #findBySenderOrReceiverOrderByTransactionCreatedAtDesc (AppUser, AppUser, Pageable) : récupère toutes les transactions
+ *         envoyées ou reçues par un utilisateur, avec pagination, triées de la plus récente à la plus ancienne.</li>
+ *     <li> #countBySenderOrReceiver (AppUser, AppUser) : compte le nombre total de transactions
  *         pour un utilisateur (utile pour le calcul du nombre de pages).</li>
  * </ul>
  *
@@ -30,14 +30,17 @@ public interface AppTransactionRepository extends JpaRepository<AppTransaction, 
 
     /**
      * Récupère toutes les transactions telles que l'utilisateur est soit l'expéditeur,
-     * soit le destinataire, avec pagination.
+     * soit le destinataire, avec pagination, triées par date de création décroissante.
+     * <p>
+     *  Les transactions les plus récentes apparaissent en premier.
      *
      * @param sender   l'utilisateur expéditeur
      * @param receiver l'utilisateur destinataire
      * @param pageable objet de pagination (page, taille, tri)
-     * @return une page de AppTransaction correspondant à l'utilisateur
+     * @return une page de AppTransaction correspondant à l'utilisateur,
+     *           triée par date de création décroissante
      */
-    Page<AppTransaction> findBySenderOrReceiver(AppUser sender, AppUser receiver, Pageable pageable);
+    Page<AppTransaction> findBySenderOrReceiverOrderByTransactionCreatedAtDesc(AppUser sender, AppUser receiver, Pageable pageable);
 
 
     /**

@@ -148,8 +148,8 @@ Le schéma ci-dessous illustre les tables et leurs relations dans la base de don
 
 ### Création de la base de données
 
-Créez le schéma de la base de données MySQL à l'aide du fichier :  
-`/src/main/resources/script/schema.sql`.
+Créez le schéma de la base de données MySQL à l'aide du fichier :
+[script SQL](src/main/resources/scripts/schema.sql)
 
 ## Scénario Utilisateur
 
