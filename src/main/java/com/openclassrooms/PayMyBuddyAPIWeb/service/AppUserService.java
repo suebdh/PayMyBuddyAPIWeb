@@ -275,7 +275,8 @@ public class AppUserService {
 
     // NOUVELLE VERSION PAGINÉE
     /**
-     * Récupère l'historique paginé des transactions de l'utilisateur.
+     * Récupère l'historique paginé des transactions de l'utilisateur,
+     *  trié de la plus récente à la plus ancienne.
      *
      * @param page numéro de la page (0-indexée)
      * @param size nombre de transactions par page
@@ -286,7 +287,7 @@ public class AppUserService {
 
         Pageable pageable = PageRequest.of(page, size);
         Page<AppTransaction> transactionPage =
-                appTransactionRepository.findBySenderOrReceiver(currentUser, currentUser, pageable);
+                appTransactionRepository.findBySenderOrReceiverOrderByTransactionCreatedAtDesc(currentUser, currentUser, pageable);
 
         return transactionPage.stream()
                 .map(tx -> {
@@ -307,7 +308,7 @@ public class AppUserService {
                 .toList();
     }
 
-    // Utile pour calculer le nombre total de pages en fonction du nombre de transactions par page)
+    // Utile pour calculer le nombre total de pages en fonction du nombre de transactions par page
     /**
      * Compte le nombre total de transactions de l'utilisateur connecté.
      *
