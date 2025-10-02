@@ -3,6 +3,7 @@ package com.openclassrooms.PayMyBuddyAPIWeb.controller;
 import com.openclassrooms.PayMyBuddyAPIWeb.dto.TransferFormDTO;
 import com.openclassrooms.PayMyBuddyAPIWeb.dto.TransferHistoryDTO;
 import com.openclassrooms.PayMyBuddyAPIWeb.entity.AppUser;
+import com.openclassrooms.PayMyBuddyAPIWeb.service.AppTransactionService;
 import com.openclassrooms.PayMyBuddyAPIWeb.service.AppUserService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -35,8 +36,11 @@ public class TransferController {
 
     private final AppUserService appUserService;
 
-    public TransferController(AppUserService appUserService) {
+    private final AppTransactionService appTransactionService;
+
+    public TransferController(AppUserService appUserService, AppTransactionService appTransactionService) {
         this.appUserService = appUserService;
+        this.appTransactionService = appTransactionService;
     }
 
     /**
@@ -69,11 +73,11 @@ public class TransferController {
         model.addAttribute("friends", friends);
 
         // 3. Récupère l'historique des transactions
-        List<TransferHistoryDTO> transactions = appUserService.getTransactionHistoryForCurrentUser(page, size);
+        List<TransferHistoryDTO> transactions = appTransactionService.getTransactionHistoryForCurrentUser(page, size);
         model.addAttribute("transactions", transactions);
 
         // 4. Récupération paginée des transactions
-        int totalTransactions = appUserService.countTransactionsForCurrentUser();
+        int totalTransactions = appTransactionService.countTransactionsForCurrentUser();
         int totalPages = (int) Math.ceil((double) totalTransactions / size);
 
         model.addAttribute("currentPage", page);
@@ -111,8 +115,8 @@ public class TransferController {
         // Fonction utilitaire pour ajouter les attributs de pagination et amis
         Runnable populateModel = () -> {
             List<AppUser> friends = appUserService.getFriendsForCurrentUser();
-            List<TransferHistoryDTO> transactions = appUserService.getTransactionHistoryForCurrentUser(0, 5);
-            int totalTransactions = appUserService.countTransactionsForCurrentUser();
+            List<TransferHistoryDTO> transactions = appTransactionService.getTransactionHistoryForCurrentUser(0, 5);
+            int totalTransactions = appTransactionService.countTransactionsForCurrentUser();
             int totalPages = (int) Math.ceil((double) totalTransactions / 5);
 
             model.addAttribute("friends", friends);
@@ -129,7 +133,7 @@ public class TransferController {
         }
 
         try {
-            appUserService.processTransfer(transferForm);
+            appTransactionService.processTransfer(transferForm);
             redirectAttributes.addFlashAttribute("successMessage", "Transfert d'argent effectué avec succès.");
             return "redirect:/transfer";
         } catch (IllegalArgumentException e) {
