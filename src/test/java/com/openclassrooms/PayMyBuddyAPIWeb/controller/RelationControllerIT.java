@@ -2,7 +2,9 @@ package com.openclassrooms.PayMyBuddyAPIWeb.controller;
 
 import com.openclassrooms.PayMyBuddyAPIWeb.dto.RegisterDTO;
 import com.openclassrooms.PayMyBuddyAPIWeb.dto.RelationDTO;
+import com.openclassrooms.PayMyBuddyAPIWeb.entity.AppUser;
 import com.openclassrooms.PayMyBuddyAPIWeb.exception.EmailAlreadyUsedException;
+import com.openclassrooms.PayMyBuddyAPIWeb.repository.AppUserRepository;
 import com.openclassrooms.PayMyBuddyAPIWeb.service.AppUserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -14,6 +16,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -31,6 +34,9 @@ public class RelationControllerIT {
 
     @Autowired
     private AppUserService appUserService;
+
+    @Autowired
+    private AppUserRepository appUserRepository;
 
     @BeforeEach
     void setUp() {
@@ -147,7 +153,15 @@ public class RelationControllerIT {
         // Ajouter cet ami une première fois → succès
         appUserService.addFriendByEmail("tempfriend@example.com");
 
-        // Essayer de l’ajouter une deuxième fois → doit provoquer IllegalStateException
+        // Recharger l'utilisateur courant depuis la BDD
+        AppUser refreshedUser = appUserRepository.findByEmailWithFriends("current@example.com")
+                .orElseThrow();
+
+        // vérifier que l'ami a bien été persisté en base après le premier ajout.
+        assertTrue(refreshedUser.getFriends().stream()
+                .anyMatch(f -> f.getEmail().equals("tempfriend@example.com")));
+
+        // Essayer de l'ajouter une deuxième fois → doit provoquer IllegalStateException
         mockMvc.perform(post("/relation")
                         .with(csrf())
                         .param("email", "tempfriend@example.com"))
